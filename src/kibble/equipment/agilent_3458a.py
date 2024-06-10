@@ -156,9 +156,12 @@ class Agilent3458A:
     def fetch(self, initiate: bool = False) -> np.ndarray:
         """Fetch the samples.
 
+        This is a blocking call and will not return to the calling program until
+        all samples have been acquired.
+
         :param initiate: Whether to call :meth:`.initiate` before fetching the samples.
 
-        :return: The raw samples.
+        :return: The samples.
         """
         if initiate:
             self.initiate()
@@ -188,7 +191,12 @@ class Agilent3458A:
         return np.array(samples.split(',')[::-1], dtype=float)
 
     def initiate(self) -> None:
-        """Put the digital multimeter in the wait-for-trigger state (arm the trigger)."""
+        """Put the digital multimeter in the wait-for-trigger state (arm the trigger).
+
+        If the digital multimeter has been configured for trigger mode ``IMMEDIATE``,
+        then the digital multimeter will start acquiring data once :meth:`.initiate`
+        is called.
+        """
         self._cxn.write(self._initiate_cmd)
 
     def reset(self) -> None:
@@ -196,5 +204,10 @@ class Agilent3458A:
         self._cxn.write('RESET;TARM HOLD;')
 
     def trigger(self) -> None:
-        """Send a software trigger."""
+        """Send a software trigger.
+
+        If the digital multimeter has been configured for trigger mode ``BUS``,
+        then the digital multimeter will start acquiring data once :meth:`.trigger`
+        is called.
+        """
         self._cxn.write('MEM FIFO;TARM SGL')
