@@ -1,0 +1,248 @@
+"""
+Communicate with a SpinCore PulseBlaster.
+"""
+from __future__ import annotations
+
+import re
+from ctypes import c_char_p, c_double, c_int
+from dataclasses import dataclass
+from enum import IntEnum
+from typing import TYPE_CHECKING
+
+from msl.equipment.connection_sdk import ConnectionSDK
+from msl.equipment.resources import register
+
+if TYPE_CHECKING:
+    from typing import Any, Sequence
+    from msl.equipment import EquipmentRecord
+
+
+@dataclass
+class Version:
+    software: str
+    firmware: str
+
+
+class Status(IntEnum):
+    """Board status."""
+    STOPPED = 1 << 0
+    RESET = 1 << 1
+    RUNNING = 1 << 2
+    WAITING = 1 << 3
+    SCANNING = 1 << 4
+
+
+class Code(IntEnum):
+    """Program instruction codes."""
+    CONTINUE = 0
+    STOP = 1
+    LOOP = 2
+    END_LOOP = 3
+    JSR = 4
+    RTS = 5
+    BRANCH = 6
+    LONG_DELAY = 7
+    WAIT = 8
+    RTI = 9
+
+
+@register(manufacturer=r'Spin\s*Core', model=r'Pulse\s*Blaster', flags=re.IGNORECASE)
+class PulseBlaster(ConnectionSDK):
+
+    Code = Code
+    Status = Status
+
+    def __init__(self, record: EquipmentRecord) -> None:
+        """Communicate with a SpinCore PulseBlaster.
+
+        See `SpinAPI <http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html>`_
+        for the API reference.
+
+        :param record: The equipment record.
+        """
+        self._closed = False
+        super().__init__(record=record, libtype='cdll')
+
+        # initialize function declarations in spinapi64.dll
+        self.sdk.pb_get_error.argtype = []
+        self.sdk.pb_get_error.restype = c_char_p
+
+        self.sdk.pb_read_status.argtype = []
+        self.sdk.pb_read_status.restype = c_int
+
+        self.sdk.pb_count_boards.argtype = []
+        self.sdk.pb_count_boards.restype = c_int
+
+        self.sdk.pb_select_board.argtype = [c_int]
+        self.sdk.pb_select_board.restype = c_int
+        self.sdk.pb_select_board.errcheck = self._errcheck
+
+        self.sdk.pb_init.argtype = []
+        self.sdk.pb_init.restype = c_int
+        self.sdk.pb_init.errcheck = self._errcheck
+
+        self.sdk.pb_close.argtype = []
+        self.sdk.pb_close.restype = c_int
+        self.sdk.pb_close.errcheck = self._errcheck
+
+        self.sdk.pb_get_version.argtype = []
+        self.sdk.pb_get_version.restype = c_char_p
+
+        self.sdk.pb_get_firmware_id.argtype = []
+        self.sdk.pb_get_firmware_id.restype = c_int
+
+        self.sdk.pb_core_clock.argtype = [c_double]
+        self.sdk.pb_core_clock.restype = None
+
+        self.sdk.pb_start_programming.argtype = [c_int]
+        self.sdk.pb_start_programming.restype = c_int
+        self.sdk.pb_start_programming.errcheck = self._errcheck
+
+        self.sdk.pb_stop_programming.argtype = []
+        self.sdk.pb_stop_programming.restype = c_int
+        self.sdk.pb_stop_programming.errcheck = self._errcheck
+
+        self.sdk.pb_inst_pbonly.argtype = [c_int, c_int, c_int, c_double]
+        self.sdk.pb_inst_pbonly.restype = c_int
+        self.sdk.pb_inst_pbonly.errcheck = self._errcheck
+
+        self.sdk.pb_reset.argtype = []
+        self.sdk.pb_reset.restype = c_int
+        self.sdk.pb_reset.errcheck = self._errcheck
+
+        self.sdk.pb_start.argtype = []
+        self.sdk.pb_start.restype = c_int
+        self.sdk.pb_start.errcheck = self._errcheck
+
+        self.sdk.pb_stop.argtype = []
+        self.sdk.pb_stop.restype = c_int
+        self.sdk.pb_stop.errcheck = self._errcheck
+
+        # configure the default PulseBlaster settings
+        n_boards: int = self.sdk.pb_count_boards()
+        if n_boards <= 0:
+            raise RuntimeError('No PulseBlaster boards are available')
+        if n_boards > 1:
+            raise RuntimeError(f'{n_boards} PulseBlaster boards are available.')
+
+        self.sdk.pb_select_board(0)
+        self.sdk.pb_init()
+        self.sdk.pb_core_clock(c_double(100))  # 100 MHz clock frequency
+
+    def _errcheck(self, result: int, func: Any, args: tuple[Any, ...]) -> int:
+        if result >= 0:
+            return result
+
+        msg = self.sdk.pb_get_error().decode() or 'Unknown reason'
+        raise RuntimeError(f'PulseBlaster.{func.__name__}{args} {msg} [code: {result}]')
+
+    def add_instruction(self,
+                        *,
+                        bits: Sequence[int] | None = None,
+                        code: Code | int = Code.CONTINUE,
+                        duration: float = 1e-3,
+                        data: int = 0) -> int:
+        """Add an instruction to the ``PULSE_PROGRAM``.
+
+        :param bits: A sequence of bits to set to be TTL high. Each value must
+            be between 0 and 23, inclusive.
+        :param code: Operation code for the instruction.
+        :param duration: Number of seconds to use for this instruction.
+        :param data: The corresponding data for the `code` parameter.
+
+        :return: The address of the created instruction. This address can be
+            used as the branch address for any branch instructions.
+        """
+        flags = 0
+        if bits is not None:
+            for bit in bits:
+                assert 0 <= bit <= 23, f'A bit must be in the range 0..23, got {bit}'
+                flags |= 1 << bit
+        return self.sdk.pb_inst_pbonly(flags, code, data, c_double(duration * 1e9))
+
+    def configure_two_pulses(self,
+                             *,
+                             pulse1: int = 0,
+                             pulse2: int = 1,
+                             width: float = 1e-3,
+                             delay: float = 0) -> None:
+        """Configure a new ``PULSE_PROGRAM`` that creates two pulses.
+
+        :param pulse1: The `bit#` to use for the first pulse.
+        :param pulse2: The `bit#` to use for the second pulse.
+        :param width: The width, in seconds, of each pulse.
+        :param delay: The delay of the second pulse.
+        """
+        if delay < 0:
+            raise ValueError(f'Only positive delays are allowed, got {delay}')
+
+        self.start_programming()
+
+        if delay == 0:
+            self.add_instruction(bits=[pulse1, pulse2], duration=width)
+        elif delay < width:
+            d = max(width - delay, 50e-9)  # 50ns is minimum allowed
+            self.add_instruction(bits=[pulse1], duration=delay)
+            self.add_instruction(bits=[pulse1, pulse2], duration=d)
+            self.add_instruction(bits=[pulse2], duration=delay)
+        else:
+            d = max(delay - width, 50e-9)  # 50ns is minimum allowed
+            self.add_instruction(bits=[pulse1], duration=width)
+            self.add_instruction(duration=d)
+            self.add_instruction(bits=[pulse2], duration=width)
+
+        self.add_instruction(duration=width)
+        self.add_instruction(code=Code.STOP)
+
+        self.stop_programming()
+
+    def disconnect(self) -> None:
+        """Disconnect from the PulseBlaster board."""
+        if self._closed:
+            return
+        self.sdk.pb_close()
+        self._closed = True
+
+    def reset(self) -> None:
+        """Stops the output of board and resets the PulseBlaster."""
+        self.sdk.pb_reset()
+
+    def start(self) -> None:
+        """Send a software trigger to the board to start the pulse program."""
+        self.sdk.pb_start()
+
+    def start_programming(self) -> None:
+        """Start a ``PULSE_PROGRAM``."""
+        self.sdk.pb_start_programming(0)  # PULSE_PROGRAM = 0
+
+    def status(self) -> Status:
+        """Read status from the board."""
+        return Status(self.sdk.pb_read_status())
+
+    def stop(self) -> None:
+        """Stops output of board. Analog output will return to ground, and TTL
+        outputs will either remain in the same state they were in when the
+        reset command was received or return to ground."""
+        self.sdk.pb_stop()
+
+    def stop_programming(self) -> None:
+        """Stop programming the ``PULSE_PROGRAM``, which was started by :meth:`.start_programming`."""
+        self.sdk.pb_stop_programming()
+
+    def trigger(self) -> None:
+        """Restart the ``PULSE_PROGRAM``."""
+        self.reset()
+        self.start()
+
+    def version(self) -> Version:
+        """Get the software version information of the SpinCore library
+        and the firmware ID of the board.
+        """
+        fw = self.sdk.pb_get_firmware_id()
+
+        # See: C:\SpinCore\SpinAPI\examples\General\pb_read_firmware.c
+        device = (fw & 0xFF00) >> 8
+        revision = (fw & 0x00FF)
+
+        return Version(software=self.sdk.pb_get_version().decode(),
+                       firmware=f'{device}-{revision}')
