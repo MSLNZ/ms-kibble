@@ -52,6 +52,8 @@ class PulseBlaster(ConnectionSDK):
     Code = Code
     Status = Status
 
+    MIN_DURATION = 50e-9  # 50ns is the minimum duration for a pulse-program instruction
+
     def __init__(self, record: EquipmentRecord) -> None:
         """Communicate with a SpinCore PulseBlaster.
 
@@ -165,13 +167,20 @@ class PulseBlaster(ConnectionSDK):
                              pulse1: int = 0,
                              pulse2: int = 1,
                              width: float = 1e-3,
-                             delay: float = 0) -> None:
+                             delay: float = 0,
+                             single: bool = True,
+                             period: float | None = None) -> None:
         """Configure a new ``PULSE_PROGRAM`` that creates two pulses.
 
         :param pulse1: The `bit#` to use for the first pulse.
         :param pulse2: The `bit#` to use for the second pulse.
         :param width: The width, in seconds, of each pulse.
-        :param delay: The delay of the second pulse.
+        :param delay: The delay, in seconds, of the second pulse.
+        :param single: Whether the pulses are output in single-shot mode. If
+            enabled, the :meth:`.trigger` method must be called before the pulses
+            are output.
+        :param period: The time, in seconds, between the rising edge of the
+            first pulses. Only used if `single` is False.
         """
         if delay < 0:
             raise ValueError(f'Only positive delays are allowed, got {delay}')
@@ -179,20 +188,32 @@ class PulseBlaster(ConnectionSDK):
         self.start_programming()
 
         if delay == 0:
-            self.add_instruction(bits=[pulse1, pulse2], duration=width)
+            total = width
+            start = self.add_instruction(bits=[pulse1, pulse2], duration=width)
         elif delay < width:
-            d = max(width - delay, 50e-9)  # 50ns is minimum allowed
-            self.add_instruction(bits=[pulse1], duration=delay)
+            d = max(width - delay, self.MIN_DURATION)
+            total = delay + d + delay
+            start = self.add_instruction(bits=[pulse1], duration=delay)
             self.add_instruction(bits=[pulse1, pulse2], duration=d)
             self.add_instruction(bits=[pulse2], duration=delay)
         else:
-            d = max(delay - width, 50e-9)  # 50ns is minimum allowed
-            self.add_instruction(bits=[pulse1], duration=width)
+            d = max(delay - width, self.MIN_DURATION)
+            total = width + d + width
+            start = self.add_instruction(bits=[pulse1], duration=width)
             self.add_instruction(duration=d)
             self.add_instruction(bits=[pulse2], duration=width)
 
-        self.add_instruction(duration=width)
-        self.add_instruction(code=Code.STOP)
+        self.add_instruction(duration=self.MIN_DURATION)
+        if single:
+            self.add_instruction(code=Code.STOP, duration=self.MIN_DURATION)
+        else:
+            if period:
+                if period < total:
+                    raise ValueError(f'period ({period}) < total time for pulses ({total})')
+                period = max(period - total, self.MIN_DURATION)
+            else:
+                period = self.MIN_DURATION
+            self.add_instruction(code=Code.BRANCH, data=start, duration=period)
 
         self.stop_programming()
 
