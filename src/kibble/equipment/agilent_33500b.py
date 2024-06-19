@@ -42,7 +42,7 @@ class Agilent33500B:
                        amplitude: float = 3,
                        frequency: float = 1,
                        load: float | None = 50,
-                       offset: float = 1,
+                       offset: float = 0,
                        phase: float = 0,
                        unit: Literal['VPP', 'VRMS', 'DBM'] = 'VPP',
                        ) -> None:
