@@ -1,13 +1,61 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "kibble"
-version = "0.1.0.dev0"
+dynamic = ["version"]
 dependencies = [
   "msl-equipment @ git+https://github.com/MSLNZ/msl-equipment.git",
+]
+requires-python = ">= 3.12"
+description = "MSL Kibble Balance software."
+license = {file = "LICENSE.txt"}
+readme = "README.md"
+authors = [
+  {name = "Measurement Standards Laboratory of New Zealand", email = "info@measurement.govt.nz"},
+]
+maintainers = [
+  {name = "Joseph Borbely", email = "joseph.borbely@measurement.govt.nz"},
+  {name = "Yin Hsien Fung", email = "yinhsien.fung@measurement.govt.nz"},
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Software Development",
+]
+
+[project.urls]
+Homepage = "https://github.com/MSLNZ/ms-kibble"
+Source = "https://github.com/MSLNZ/ms-kibble"
+
+[project.optional-dependencies]
+tests = [
+  "pytest",
+]
+docs = [
+  "black",
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings-python",
+]
+dev = [
+  "msl-kcdb[tests,docs]",
+  "mypy",
 ]
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/kibble/_version.py"
