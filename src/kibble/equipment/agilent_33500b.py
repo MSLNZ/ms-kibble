@@ -16,9 +16,10 @@ class Agilent33500B:
     def __init__(self, record: EquipmentRecord, *, reset: bool = True, clear: bool = True) -> None:
         """Communicate with an Agilent 33500B Waveform Generator.
 
-        :param record: The equipment record.
-        :param reset: Whether to automatically send the *RST command.
-        :param clear: Whether to automatically send the *CLS command.
+        Args:
+            record: The equipment record.
+            reset: Whether to automatically send the `*RST` command.
+            clear: Whether to automatically send the `*CLS` command.
         """
         self._cxn = record.connect()
 
@@ -46,15 +47,16 @@ class Agilent33500B:
     ) -> None:
         """Configure a SINUSOID waveform for a particular channel.
 
-        :param channel: The channel number to configure.
-        :param amplitude: The amplitude of the waveform.
-        :param frequency: The frequency, in Hz, of the waveform.
-        :param load: The load termination, in Ohms. In the range 1 to 10 kOhm,
-            or :data:`None` for infinite (High Z).
-        :param offset: The offset of the waveform.
-        :param phase: The phase, in degrees, of the waveform. In the range
-            0 to 360 degrees.
-        :param unit: The `amplitude` and `offset` unit.
+        Args:
+            channel: The channel number to configure.
+            amplitude: The amplitude of the waveform.
+            frequency: The frequency, in Hz, of the waveform.
+            load: The load termination, in Ohms. In the range 1 to 10 kOhm,
+                or `None` for infinite (High Z).
+            offset: The offset of the waveform.
+            phase: The phase, in degrees, of the waveform. In the range
+                0 to 360 degrees.
+            unit: The `amplitude` and `offset` unit.
         """
         if channel not in [1, 2]:
             msg = f"Channel must be either 1 or 2, got {channel}"
@@ -94,8 +96,9 @@ class Agilent33500B:
     def output(self, *, channel: int, state: bool) -> None:
         """Turn the output of a channel on or off.
 
-        :param channel: The channel number, 1 or 2.
-        :param state: Either on (True) or off (False)
+        Args:
+            channel: The channel number, 1 or 2.
+            state: Either on (`True`) or off (`False`)
         """
         if channel not in [1, 2]:
             msg = f"Channel must be either 1 or 2, got {channel}"

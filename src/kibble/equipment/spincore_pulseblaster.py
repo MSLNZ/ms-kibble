@@ -55,15 +55,19 @@ class Code(IntEnum):
 class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
     """SpinCore PulseBlaster."""
 
+    CODE = Code
+    STATUS = Status
+
     MIN_DURATION = 50e-9  # 50ns is the minimum duration for a pulse-program instruction
 
     def __init__(self, record: EquipmentRecord) -> None:  # noqa: PLR0915
         """Communicate with a SpinCore PulseBlaster.
 
-        See `SpinAPI <http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html>`_
+        See [SpinAPI](http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html)
         for the API reference.
 
-        :param record: The equipment record.
+        Args:
+            record: The equipment record.
         """
         self._closed = False
         super().__init__(record=record, libtype="cdll")
@@ -154,13 +158,15 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
     ) -> int:
         """Add an instruction to the ``PULSE_PROGRAM``.
 
-        :param bits: A sequence of bits to set to be TTL high. Each value must
-            be between 0 and 23, inclusive.
-        :param code: Operation code for the instruction.
-        :param duration: Number of seconds to use for this instruction.
-        :param data: The corresponding data for the `code` parameter.
+        Args:
+            bits: A sequence of bits to set to be TTL high. Each value must
+                be between 0 and 23, inclusive.
+            code: Operation code for the instruction.
+            duration: Number of seconds to use for this instruction.
+            data: The corresponding data for the `code` parameter.
 
-        :return: The address of the created instruction. This address can be
+        Returns:
+            The address of the created instruction. This address can be
             used as the branch address for any branch instructions.
         """
         flags = 0
@@ -170,6 +176,7 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
                     msg = f"A bit must be in the range 0..23, got {bit}"
                     raise ValueError(msg)
                 flags |= 1 << bit
+
         return int(self.sdk.pb_inst_pbonly(flags, code, data, c_double(duration * 1e9)))
 
     def configure_two_pulses(
@@ -184,15 +191,15 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
     ) -> None:
         """Configure a new ``PULSE_PROGRAM`` that creates two pulses.
 
-        :param pulse1: The `bit#` to use for the first pulse.
-        :param pulse2: The `bit#` to use for the second pulse.
-        :param width: The width, in seconds, of each pulse.
-        :param delay: The delay, in seconds, of the second pulse.
-        :param single: Whether the pulses are output in single-shot mode. If
-            enabled, the :meth:`.trigger` method must be called before the pulses
-            are output.
-        :param period: The time, in seconds, between the rising edge of the
-            first pulses. Only used if `single` is False.
+        Args:
+            pulse1: The `bit#` to use for the first pulse.
+            pulse2: The `bit#` to use for the second pulse.
+            width: The width, in seconds, of each pulse.
+            delay: The delay, in seconds, of the second pulse.
+            single: Whether the pulses are output in single-shot mode. If enabled,
+                the `trigger()` method must be called before the pulses are output.
+            period: The time, in seconds, between the rising edge of the
+                first pulses. Only used if `single` is `False`.
         """
         if delay < 0:
             msg = f"Only positive delays are allowed, got {delay}"
@@ -257,13 +264,13 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
     def stop(self) -> None:
         """Stops output of board.
 
-        Analog output will return to ground, and TTL outputs will either remain in the same state they were in when the
-        reset command was received or return to ground.
+        Analog output will return to ground, and TTL outputs will either remain in the same
+        state they were in when the reset command was received or return to ground.
         """
         self.sdk.pb_stop()
 
     def stop_programming(self) -> None:
-        """Stop programming the ``PULSE_PROGRAM``, which was started by :meth:`.start_programming`."""
+        """Stop programming the ``PULSE_PROGRAM``, which was started by `start_programming()`."""
         self.sdk.pb_stop_programming()
 
     def trigger(self) -> None:
@@ -272,7 +279,11 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
         self.start()
 
     def version(self) -> Version:
-        """Get the version information."""
+        """Get the version information.
+
+        Returns:
+            Version information.
+        """
         fw = self.sdk.pb_get_firmware_id()
 
         # See: C:\SpinCore\SpinAPI\examples\General\pb_read_firmware.c

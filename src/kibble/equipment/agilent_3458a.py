@@ -21,9 +21,10 @@ class Agilent3458A:
     def __init__(self, record: EquipmentRecord, *, reset: bool = True, clear: bool = True) -> None:
         """Communicate with an Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter.
 
-        :param record: The equipment record.
-        :param reset: Whether to automatically send the RESET command.
-        :param clear: Whether to automatically send the GPIB CLEAR command.
+        Args:
+            record: The equipment record.
+            reset: Whether to automatically send the RESET command.
+            clear: Whether to automatically send the GPIB CLEAR command.
         """
         self._initiate_cmd: str = "<gets updated in configure>"
         self._check_revision: bool = True
@@ -60,20 +61,22 @@ class Agilent3458A:
     ) -> float:
         """Configure the digital multimeter.
 
-        :param function: The measurement function. Currently, only DCV is allowed.
-        :param range: The range to use for the measurement.
-        :param nsamples: The number of samples to acquire after a trigger event.
-        :param aperature: The A/D converter integration time in seconds.
-        :param auto_zero: The auto-zero mode. Either ONCE, ON or OFF.
-        :param trigger: The trigger mode. Either IMMEDIATE, BUS or EXTERNAL.
-        :param edge: The trigger edge (only used if `trigger` is EXTERNAL).
-            Must always be FALLING.
-        :param ntriggers: The number of triggers that are accepted before
-            returning to the wait-for-trigger state.
-        :param delay: The number of seconds to wait after a trigger event before
-            acquiring samples. A value of :data:`None` is equivalent to zero.
+        Args:
+            function: The measurement function. Currently, only DCV is allowed.
+            range: The range to use for the measurement.
+            nsamples: The number of samples to acquire after a trigger event.
+            aperature: The A/D converter integration time in seconds.
+            auto_zero: The auto-zero mode. Either ONCE, ON or OFF.
+            trigger: The trigger mode. Either IMMEDIATE, BUS or EXTERNAL.
+            edge: The trigger edge (only used if `trigger` is EXTERNAL).
+                Must always be FALLING.
+            ntriggers: The number of triggers that are accepted before
+                returning to the wait-for-trigger state.
+            delay: The number of seconds to wait after a trigger event before
+                acquiring samples. A value of `None` is equivalent to zero.
 
-        :return: The actual A/D converter integration time in seconds.
+        Returns:
+            The actual A/D converter integration time in seconds.
         """
         if function != "DCV":
             msg = f"Only DCV is implemented, not {function!r}"
@@ -164,9 +167,11 @@ class Agilent3458A:
         This is a blocking call and will not return to the calling program until
         all samples have been acquired.
 
-        :param initiate: Whether to call :meth:`.initiate` before fetching the samples.
+        Args:
+            initiate: Whether to call `initiate()` before fetching the samples.
 
-        :return: The samples.
+        Returns:
+            The samples.
         """
         if initiate:
             self.initiate()
@@ -198,9 +203,8 @@ class Agilent3458A:
     def initiate(self) -> None:
         """Put the digital multimeter in the wait-for-trigger state (arm the trigger).
 
-        If the digital multimeter has been configured for trigger mode ``IMMEDIATE``,
-        then the digital multimeter will start acquiring data once :meth:`.initiate`
-        is called.
+        If the digital multimeter has been configured for trigger mode `IMMEDIATE`,
+        then the digital multimeter will start acquiring data once this method is called.
         """
         self._cxn.write(self._initiate_cmd)
 
@@ -211,8 +215,7 @@ class Agilent3458A:
     def trigger(self) -> None:
         """Send a software trigger.
 
-        If the digital multimeter has been configured for trigger mode ``BUS``,
-        then the digital multimeter will start acquiring data once :meth:`.trigger`
-        is called.
+        If the digital multimeter has been configured for trigger mode `BUS`, then
+        the digital multimeter will start acquiring data once this method is called.
         """
         self._cxn.write("MEM FIFO;TARM SGL")
