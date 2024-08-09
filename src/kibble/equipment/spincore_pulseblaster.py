@@ -1,6 +1,5 @@
-"""
-Communicate with a SpinCore PulseBlaster.
-"""
+"""SpinCore PulseBlaster."""
+
 from __future__ import annotations
 
 import re
@@ -9,22 +8,27 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import TYPE_CHECKING
 
-from msl.equipment.connection_sdk import ConnectionSDK
-from msl.equipment.resources import register
+from msl.equipment.connection_sdk import ConnectionSDK  # type: ignore[import-untyped]
+from msl.equipment.resources import register  # type: ignore[import-untyped]
 
 if TYPE_CHECKING:
-    from typing import Any, Sequence
-    from msl.equipment import EquipmentRecord
+    from collections.abc import Sequence
+    from typing import Any
+
+    from msl.equipment import EquipmentRecord  # type: ignore[import-untyped]
 
 
 @dataclass
 class Version:
+    """Board software and firmware version numbers."""
+
     software: str
     firmware: str
 
 
 class Status(IntEnum):
     """Board status."""
+
     STOPPED = 1 << 0
     RESET = 1 << 1
     RUNNING = 1 << 2
@@ -34,6 +38,7 @@ class Status(IntEnum):
 
 class Code(IntEnum):
     """Program instruction codes."""
+
     CONTINUE = 0
     STOP = 1
     LOOP = 2
@@ -46,15 +51,13 @@ class Code(IntEnum):
     RTI = 9
 
 
-@register(manufacturer=r'Spin\s*Core', model=r'Pulse\s*Blaster', flags=re.IGNORECASE)
-class PulseBlaster(ConnectionSDK):
-
-    Code = Code
-    Status = Status
+@register(manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", flags=re.IGNORECASE)
+class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
+    """SpinCore PulseBlaster."""
 
     MIN_DURATION = 50e-9  # 50ns is the minimum duration for a pulse-program instruction
 
-    def __init__(self, record: EquipmentRecord) -> None:
+    def __init__(self, record: EquipmentRecord) -> None:  # noqa: PLR0915
         """Communicate with a SpinCore PulseBlaster.
 
         See `SpinAPI <http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html>`_
@@ -63,7 +66,7 @@ class PulseBlaster(ConnectionSDK):
         :param record: The equipment record.
         """
         self._closed = False
-        super().__init__(record=record, libtype='cdll')
+        super().__init__(record=record, libtype="cdll")
 
         # initialize function declarations in spinapi64.dll
         self.sdk.pb_get_error.argtype = []
@@ -123,27 +126,32 @@ class PulseBlaster(ConnectionSDK):
         # configure the default PulseBlaster settings
         n_boards: int = self.sdk.pb_count_boards()
         if n_boards <= 0:
-            raise RuntimeError('No PulseBlaster boards are available')
+            msg = "No PulseBlaster boards are available"
+            raise RuntimeError(msg)
         if n_boards > 1:
-            raise RuntimeError(f'{n_boards} PulseBlaster boards are available.')
+            msg = f"{n_boards} PulseBlaster boards are available."
+            raise RuntimeError(msg)
 
         self.sdk.pb_select_board(0)
         self.sdk.pb_init()
         self.sdk.pb_core_clock(c_double(100))  # 100 MHz clock frequency
 
-    def _errcheck(self, result: int, func: Any, args: tuple[Any, ...]) -> int:
+    def _errcheck(self, result: int, func: Any, args: tuple[Any, ...]) -> int:  # noqa: ANN401
         if result >= 0:
             return result
 
-        msg = self.sdk.pb_get_error().decode() or 'Unknown reason'
-        raise RuntimeError(f'PulseBlaster.{func.__name__}{args} {msg} [code: {result}]')
+        msg = self.sdk.pb_get_error().decode() or "Unknown reason"
+        msg = f"PulseBlaster.{func.__name__}{args} {msg} [code: {result}]"
+        raise RuntimeError(msg)
 
-    def add_instruction(self,
-                        *,
-                        bits: Sequence[int] | None = None,
-                        code: Code | int = Code.CONTINUE,
-                        duration: float = 1e-3,
-                        data: int = 0) -> int:
+    def add_instruction(
+        self,
+        *,
+        bits: Sequence[int] | None = None,
+        code: Code | int = Code.CONTINUE,
+        duration: float = 1e-3,
+        data: int = 0,
+    ) -> int:
         """Add an instruction to the ``PULSE_PROGRAM``.
 
         :param bits: A sequence of bits to set to be TTL high. Each value must
@@ -158,18 +166,22 @@ class PulseBlaster(ConnectionSDK):
         flags = 0
         if bits is not None:
             for bit in bits:
-                assert 0 <= bit <= 23, f'A bit must be in the range 0..23, got {bit}'
+                if bit < 0 or bit > 23:  # noqa: PLR2004
+                    msg = f"A bit must be in the range 0..23, got {bit}"
+                    raise ValueError(msg)
                 flags |= 1 << bit
-        return self.sdk.pb_inst_pbonly(flags, code, data, c_double(duration * 1e9))
+        return int(self.sdk.pb_inst_pbonly(flags, code, data, c_double(duration * 1e9)))
 
-    def configure_two_pulses(self,
-                             *,
-                             pulse1: int = 0,
-                             pulse2: int = 1,
-                             width: float = 1e-3,
-                             delay: float = 0,
-                             single: bool = True,
-                             period: float | None = None) -> None:
+    def configure_two_pulses(
+        self,
+        *,
+        pulse1: int = 0,
+        pulse2: int = 1,
+        width: float = 1e-3,
+        delay: float = 0,
+        single: bool = True,
+        period: float | None = None,
+    ) -> None:
         """Configure a new ``PULSE_PROGRAM`` that creates two pulses.
 
         :param pulse1: The `bit#` to use for the first pulse.
@@ -183,7 +195,8 @@ class PulseBlaster(ConnectionSDK):
             first pulses. Only used if `single` is False.
         """
         if delay < 0:
-            raise ValueError(f'Only positive delays are allowed, got {delay}')
+            msg = f"Only positive delays are allowed, got {delay}"
+            raise ValueError(msg)
 
         self.start_programming()
 
@@ -209,7 +222,8 @@ class PulseBlaster(ConnectionSDK):
         else:
             if period:
                 if period < total:
-                    raise ValueError(f'period ({period}) < total time for pulses ({total})')
+                    msg = f"period ({period}) < total time for pulses ({total})"
+                    raise ValueError(msg)
                 period = max(period - total, self.MIN_DURATION)
             else:
                 period = self.MIN_DURATION
@@ -241,9 +255,11 @@ class PulseBlaster(ConnectionSDK):
         return Status(self.sdk.pb_read_status())
 
     def stop(self) -> None:
-        """Stops output of board. Analog output will return to ground, and TTL
-        outputs will either remain in the same state they were in when the
-        reset command was received or return to ground."""
+        """Stops output of board.
+
+        Analog output will return to ground, and TTL outputs will either remain in the same state they were in when the
+        reset command was received or return to ground.
+        """
         self.sdk.pb_stop()
 
     def stop_programming(self) -> None:
@@ -256,14 +272,11 @@ class PulseBlaster(ConnectionSDK):
         self.start()
 
     def version(self) -> Version:
-        """Get the software version information of the SpinCore library
-        and the firmware ID of the board.
-        """
+        """Get the version information."""
         fw = self.sdk.pb_get_firmware_id()
 
         # See: C:\SpinCore\SpinAPI\examples\General\pb_read_firmware.c
         device = (fw & 0xFF00) >> 8
-        revision = (fw & 0x00FF)
+        revision = fw & 0x00FF
 
-        return Version(software=self.sdk.pb_get_version().decode(),
-                       firmware=f'{device}-{revision}')
+        return Version(software=self.sdk.pb_get_version().decode(), firmware=f"{device}-{revision}")

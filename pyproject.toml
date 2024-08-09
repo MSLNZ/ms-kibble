@@ -102,5 +102,8 @@ known-first-party = ["kibble"]
   "T201",  # print statements
 ]
 
+[tool.ruff.lint.pylint]
+max-args = 10
+
 [tool.ruff.lint.pydocstyle]
 convention = "google"
