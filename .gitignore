@@ -5,18 +5,17 @@ __pycache__/
 *.py[codz]
 
 # Root directories
-/.cache/
 /.venv/
-/.env/
 /venv/
-/env/
 /.idea/
+/.vscode/
+/.coverage_html/
 /.mypy_cache/
 /.pytest_cache/
 /.ruff_cache/
-/.vscode/
+/build/
 /dist/
 
-# Root files
-/.coverage*
+# Project files
+/src/kibble/_version.py
 /equipment_register.py

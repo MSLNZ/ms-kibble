@@ -59,3 +59,50 @@ source = "vcs"
 
 [tool.hatch.build.hooks.vcs]
 version-file = "src/kibble/_version.py"
+
+[tool.mypy]
+strict = true
+implicit_reexport = true
+
+[tool.ruff]
+line-length = 120
+exclude = [
+  ".git",
+  ".mypy_cache",
+  ".pytest_cache",
+  ".ruff_cache",
+  ".venv",
+  "build",
+  "dist",
+  "venv",
+]
+extend-include = ["*.ipynb"]
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D203", # one-blank-line-before-class
+  "D213", # multi-line-summary-second-line
+  "COM812", # missing-trailing-comma
+  "ISC001", # single-line-implicit-string-concatenation
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["kibble"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+  "F401", # Imported but unused
+]
+"__about__.py" = [
+  "F401", # Imported but unused
+]
+"*.ipynb" = [
+  "T201",  # allow print statements
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
