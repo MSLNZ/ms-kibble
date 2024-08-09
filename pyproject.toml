@@ -78,9 +78,6 @@ exclude = [
 ]
 extend-include = ["*.ipynb"]
 
-[tool.ruff.format]
-skip-magic-trailing-comma = true
-
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
@@ -100,8 +97,9 @@ known-first-party = ["kibble"]
 "__about__.py" = [
   "F401", # Imported but unused
 ]
-"*.ipynb" = [
-  "T201",  # allow print statements
+"examples/*.py" = [
+  "INP001",  # implicit-namespace-package
+  "T201",  # print statements
 ]
 
 [tool.ruff.lint.pydocstyle]

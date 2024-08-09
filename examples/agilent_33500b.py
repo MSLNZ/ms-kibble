@@ -1,7 +1,10 @@
-from equipment_register import records
+"""Agilent33500B example."""
+
+from equipment_register import records  # type: ignore[import-not-found]
+
 from kibble import Agilent33500B
 
-siggen = Agilent33500B(records['siggen'])
+siggen = Agilent33500B(records["siggen"])
 
 # turn Channel 1 output off
 siggen.output(channel=1, state=False)
