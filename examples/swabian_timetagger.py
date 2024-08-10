@@ -3,16 +3,16 @@
 from kibble import TriggeredTIA
 
 with TriggeredTIA(trigger=1, start=2, stop=3, duration=1) as tia:
-    # Start the time-interval analyser measurement, this is not a blocking call
+    # Start the time-interval analyser measurement, this is not a blocking call and this script will continue
     tia.start()
 
-    # Calling wait() will block until the measurement is done.
-    # Specify a timeout, since there is no trigger signal.
-    # Enabling debug will print some info.
-    status = tia.wait(debug=True, timeout=2)
-    if status.code > 0:
-        raise RuntimeError(status.message)
+    # Implement code to send a trigger pulse to Channel 1.
+    # Ideally, there would also be start-stop signals connected to Channels 2 and 3.
 
-    # If there was an actual trigger signal, status.code == 0, and we
-    # could get the (time, amplitude) values as a structured numpy array
-    print(tia.intervals())
+    # Calling tia.intervals() will block until the measurement is done.
+    # Specify a timeout, since there is no trigger signal.
+    # Enabling debug will print the runtime and number of events of the measurement.
+    #
+    # If there was an actual trigger signal, a structured numpy array of
+    # (time, amplitude) values would be returned
+    print(tia.intervals(debug=True, timeout=2))
