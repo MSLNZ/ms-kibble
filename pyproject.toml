@@ -47,7 +47,7 @@ docs = [
   "mkdocstrings-python",
 ]
 dev = [
-  "msl-kcdb[tests,docs]",
+  "kibble[docs,tests]",
   "mypy",
 ]
 
