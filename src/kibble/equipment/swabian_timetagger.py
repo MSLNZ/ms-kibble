@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from types import TracebackType
     from typing import Any, Self
 
+    from msl.equipment import EquipmentRecord  # type: ignore[import-untyped]
     from numpy.typing import NDArray
 
 
@@ -78,6 +79,7 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         channels: Sequence[Channel],
         *,
         duration: float = 10,
+        record: EquipmentRecord | None = None,
         tagger: TimeTagger.TimeTagger | None = None,
     ) -> None:
         """Perform a time-tag measurement.
@@ -89,6 +91,8 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
             duration: The expected duration (in seconds) that measurement events will occur.
                 For gated and triggered measurements, the time before the rising edge of the
                 gate/trigger pulse shall not be included in the duration.
+            record: The equipment record. If specified and `tagger` is not specified, then the
+                serial number in the record will be used to connect to a specific `TimeTagger`.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._is_array_overflow = False  # overflow on the numpy array?
@@ -99,7 +103,8 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
         self._free_tagger = False
         if not tagger:
-            tagger = TimeTagger.createTimeTagger()
+            serial = "" if record is None else record.serial
+            tagger = TimeTagger.createTimeTagger(serial=serial)
             self._free_tagger = True
         self._tagger: TimeTagger.TimeTagger = tagger
         super().__init__(tagger)
@@ -387,6 +392,7 @@ class TimeTagGated(TimeTagMeasurement):
         events: Sequence[Channel],
         gate: Channel,
         duration: float = 10,
+        record: EquipmentRecord | None = None,
         tagger: TimeTagger.TimeTagger | None = None,
     ) -> None:
         """Perform a gated measurement.
@@ -400,6 +406,8 @@ class TimeTagGated(TimeTagMeasurement):
         Keyword Args:
             duration: The expected duration (in seconds) that measurement events will occur. The
                 time before the rising edge of the gate pulse shall not be included in the duration.
+            record: The equipment record. If specified and `tagger` is not specified, then the
+                serial number in the record will be used to connect to a specific `TimeTagger`.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._is_gated = False
@@ -408,7 +416,7 @@ class TimeTagGated(TimeTagMeasurement):
         channels = list(events)
         channels.append(Channel(gate.number, deadtime=gate.deadtime, level=gate.level, frequency=1))
         channels.append(Channel(-gate.number, deadtime=gate.deadtime, level=gate.level, frequency=1))
-        super().__init__(channels, duration=duration, tagger=tagger)
+        super().__init__(channels, duration=duration, record=record, tagger=tagger)
 
     def on_start(self) -> None:
         """Do not call. Called automatically when `self.start()` is called."""
@@ -460,6 +468,7 @@ class TimeTagTriggered(TimeTagMeasurement):
         events: Sequence[Channel],
         trigger: Channel,
         duration: float = 10,
+        record: EquipmentRecord | None = None,
         tagger: TimeTagger.TimeTagger | None = None,
     ) -> None:
         """Perform a triggered measurement.
@@ -473,9 +482,11 @@ class TimeTagTriggered(TimeTagMeasurement):
         Keyword Args:
             duration: The expected duration (in seconds) that measurement events will occur. The
                 time before the rising edge of the trigger pulse shall not be included in the duration.
+            record: The equipment record. If specified and `tagger` is not specified, then the
+                serial number in the record will be used to connect to a specific `TimeTagger`.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
-        self._finished_time = 0  # timestamp, in ps, when measurement is done
+        self._finished_time = 0  # timestamp, in picoseconds, when the measurement is done
         self._trigger_channel: int = trigger.number
 
         channels = list(events)
@@ -487,7 +498,7 @@ class TimeTagTriggered(TimeTagMeasurement):
                 frequency=1,
             )
         )
-        super().__init__(channels, duration=duration, tagger=tagger)
+        super().__init__(channels, duration=duration, record=record, tagger=tagger)
 
     def on_start(self) -> None:
         """Do not call. Called automatically when `self.start()` is called."""
@@ -533,6 +544,7 @@ class GatedTIA(TimeTagGated):
         stop: Channel | int,
         gate: Channel | int,
         duration: float = 10,
+        record: EquipmentRecord | None = None,
         tagger: TimeTagger.TimeTagger | None = None,
     ) -> None:
         """Perform a gated time-interval analysis measurement.
@@ -548,6 +560,8 @@ class GatedTIA(TimeTagGated):
         Keyword Args:
             duration: The expected duration (in seconds) that measurement events will occur. The
                 time before the rising edge of the gate pulse shall not be included in the duration.
+            record: The equipment record. If specified and `tagger` is not specified, then the
+                serial number in the record will be used to connect to a specific `TimeTagger`.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         if isinstance(start, int):
@@ -558,7 +572,7 @@ class GatedTIA(TimeTagGated):
             gate = Channel(gate, frequency=1)
         self._start_channel = start.number
         self._stop_channel = stop.number
-        super().__init__(events=[start, stop], gate=gate, duration=duration, tagger=tagger)
+        super().__init__(events=[start, stop], gate=gate, duration=duration, record=record, tagger=tagger)
 
     def intervals(self, *, debug: bool = False, timeout: float | None = None) -> NDArray[Any]:
         """Get the time-interval data.
@@ -599,6 +613,7 @@ class TriggeredTIA(TimeTagTriggered):
         stop: Channel | int,
         trigger: Channel | int,
         duration: float = 10,
+        record: EquipmentRecord | None = None,
         tagger: TimeTagger.TimeTagger | None = None,
     ) -> None:
         """Perform a triggered time-interval analysis measurement.
@@ -614,6 +629,8 @@ class TriggeredTIA(TimeTagTriggered):
         Keyword Args:
             duration: The expected duration (in seconds) that measurement events will occur. The
                 time before the rising edge of the trigger pulse shall not be included in the duration.
+            record: The equipment record. If specified and `tagger` is not specified, then the
+                serial number in the record will be used to connect to a specific `TimeTagger`.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         if isinstance(start, int):
@@ -624,7 +641,7 @@ class TriggeredTIA(TimeTagTriggered):
             trigger = Channel(trigger, frequency=1)
         self._start_channel = start.number
         self._stop_channel = stop.number
-        super().__init__(events=[start, stop], trigger=trigger, duration=duration, tagger=tagger)
+        super().__init__(events=[start, stop], trigger=trigger, duration=duration, record=record, tagger=tagger)
 
     def intervals(self, *, debug: bool = False, timeout: float | None = None) -> NDArray[Any]:
         """Get the time-interval data.
