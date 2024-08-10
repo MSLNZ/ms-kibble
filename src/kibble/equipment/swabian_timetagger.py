@@ -8,7 +8,30 @@ from time import perf_counter, sleep
 from typing import TYPE_CHECKING
 
 import numpy as np
-import TimeTagger  # type: ignore[import-untyped]
+
+try:
+    import TimeTagger  # type: ignore  # noqa: PGH003
+except ModuleNotFoundError:
+
+    class TimeTagger:  # type: ignore[no-redef]
+        """Mocked TimeTagger module."""
+
+        class CustomMeasurement:
+            """Mocked CustomMeasurement class."""
+
+            def stop(self) -> None:
+                """Mocked stop method. Avoids AttributeError in __del__."""
+
+        @staticmethod
+        def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # noqa: ARG004, N802
+            """Mocked createTimeTagger function."""
+            msg = (
+                "The Swabian Instruments TimeTagger module cannot be found.\n"
+                "Install it from https://www.swabianinstruments.com/time-tagger/downloads/\n"
+                "and ensure that the directory containing the TimeTagger module is available on sys.path"
+            )
+            raise ModuleNotFoundError(msg)
+
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
