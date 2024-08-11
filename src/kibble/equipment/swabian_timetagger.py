@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 try:
-    import TimeTagger  # type: ignore  # noqa: PGH003
+    import TimeTagger
 except ModuleNotFoundError:
     import os
     import sys
@@ -111,7 +111,7 @@ class Status:
     success: bool
 
 
-class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
+class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
     """Custom TimeTagger measurement."""
 
     def __init__(
@@ -382,13 +382,12 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         with self.mutex:
             return self._timestamps[: self._events]
 
-    def wait(self, *, debug: bool = False, timeout: float | None = None) -> Status:
+    def wait(self, *, timeout: float | None = None) -> Status:
         """Wait until the measurement is done.
 
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
-            debug: Whether to print the runtime and the number of events to the terminal.
             timeout: The maxmimum number of seconds to wait for the measurement to be done.
                 If `None`, wait forever.
 
@@ -420,13 +419,9 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
                 )
 
             sleep(self._duration * 0.05)
-            if debug:
-                print(  # noqa: T201
-                    f"Time-tag measurement runtime: {perf_counter() - t0:.3f} seconds, events: {self._events:.3e}"
-                )
 
 
-class TimeTagGated(TimeTagMeasurement):
+class TimeTagGated(TimeTag):
     """A gated time-tag measurement."""
 
     def __init__(
@@ -447,10 +442,10 @@ class TimeTagGated(TimeTagMeasurement):
             gate: The gate channel. The `frequency` attribute is ignored.
 
         Keyword Args:
-            duration: The expected duration (in seconds) that measurement events will occur. The
-                time before the rising edge of the gate pulse shall not be included in the duration.
-            record: The equipment record. If specified and `tagger` is not specified, then the
-                serial number in the record will be used to connect to a specific `TimeTagger`.
+            duration: The expected duration (in seconds) that measurement events will occur. See
+                [duration][kibble.equipment.swabian_timetagger.TimeTagMeasurement.duration] for more details.
+            record: The equipment record. See the constructor of
+                [TimeTagMeasurement][kibble.equipment.swabian_timetagger.TimeTagMeasurement] for more details.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._is_gated = False
@@ -502,7 +497,7 @@ class TimeTagGated(TimeTagMeasurement):
             self._insert_tags(gated_tags)
 
 
-class TimeTagTriggered(TimeTagMeasurement):
+class TimeTagTriggered(TimeTag):
     """A triggered time-tag measurement."""
 
     def __init__(
@@ -523,10 +518,10 @@ class TimeTagTriggered(TimeTagMeasurement):
             trigger: The trigger channel. The `frequency` attribute is ignored.
 
         Keyword Args:
-            duration: The expected duration (in seconds) that measurement events will occur. The
-                time before the rising edge of the trigger pulse shall not be included in the duration.
-            record: The equipment record. If specified and `tagger` is not specified, then the
-                serial number in the record will be used to connect to a specific `TimeTagger`.
+            duration: The expected duration (in seconds) that measurement events will occur. See
+                [duration][kibble.equipment.swabian_timetagger.TimeTagMeasurement.duration] for more details.
+            record: The equipment record. See the constructor of
+                [TimeTagMeasurement][kibble.equipment.swabian_timetagger.TimeTagMeasurement] for more details.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._finished_time = 0  # timestamp, in picoseconds, when the measurement is done
@@ -577,164 +572,145 @@ class TimeTagTriggered(TimeTagMeasurement):
             self._insert_tags(triggered_tags)
 
 
-class GatedTIA(TimeTagGated):
-    """A gated time-interval analysis measurement."""
+class TimeIntervalAnalyser:
+    """A time-interval analysis measurement based on start-stop events."""
 
     def __init__(
         self,
         *,
         start: Channel | int,
         stop: Channel | int,
-        gate: Channel | int,
         duration: float = 10,
+        gate: Channel | int | None = None,
         record: EquipmentRecord | None = None,
         tagger: TimeTagger.TimeTagger | None = None,
+        trigger: Channel | int | None = None,
     ) -> None:
-        """Perform a gated time-interval analysis measurement.
+        """Perform a time-interval analysis measurement based on start-stop events.
 
-        The start-stop time differences are used to calculate amplitudes and the
-        timestamp of each amplitude is relative to the rising edge of the gate signal.
+        The amplitudes are calculated as stop-start time differences and the time of each amplitude is relative to:
+
+        * the timestamp of the first start or stop event if neither gate nor trigger are specified
+        * the first edge of the gate pulse, or
+        * the trigger signal
 
         Args:
             start: The start channel.
             stop: The stop channel.
+
+        Keyword Args:
+            duration: The expected duration (in seconds) that measurement events will occur. See
+                [duration][kibble.equipment.swabian_timetagger.TimeTagMeasurement.duration] for more details.
             gate: The gate channel.
-
-        Keyword Args:
-            duration: The expected duration (in seconds) that measurement events will occur. The
-                time before the rising edge of the gate pulse shall not be included in the duration.
-            record: The equipment record. If specified and `tagger` is not specified, then the
-                serial number in the record will be used to connect to a specific `TimeTagger`.
+            record: The equipment record. See the constructor of
+                [TimeTagMeasurement][kibble.equipment.swabian_timetagger.TimeTagMeasurement] for more details.
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
-        """
-        if isinstance(start, int):
-            start = Channel(start)
-        if isinstance(stop, int):
-            stop = Channel(stop)
-        if isinstance(gate, int):
-            gate = Channel(gate, frequency=1)
-        self._start_channel = start.number
-        self._stop_channel = stop.number
-        super().__init__(events=[start, stop], gate=gate, duration=duration, record=record, tagger=tagger)
-
-    def intervals(
-        self, *, debug: bool = False, timeout: float | None = None
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Get the time-interval data.
-
-        This is a blocking call and will not return until the measurement finishes or there is an error.
-
-        Args:
-            debug: Whether to print the runtime and the number of events to the terminal.
-            timeout: The maxmimum number of seconds to wait for the measurement to be done.
-                If `None`, wait forever.
-
-        Returns:
-            A tuple of two numpy array's (times, amplitudes).
-
-            * `times`: Times (in seconds) of `start` events relative to the rising edge of the gate signal.
-            * `ampltiudes`: Differences (in seconds) between the `start` and `stop` timestamps.
-        """
-        status = self.wait(debug=debug, timeout=timeout)
-        if not status.success:
-            raise RuntimeError(status.message)
-        channels = self.channels
-        assert channels[0] == self._gate_channel  # noqa: S101
-        assert channels[-1] == -self._gate_channel  # noqa: S101
-        return _intervals(
-            start=self._start_channel,
-            stop=self._stop_channel,
-            channels=channels,
-            timestamps=self.timestamps,
-        )
-
-
-class TriggeredTIA(TimeTagTriggered):
-    """A triggered time-interval analysis measurement."""
-
-    def __init__(
-        self,
-        *,
-        start: Channel | int,
-        stop: Channel | int,
-        trigger: Channel | int,
-        duration: float = 10,
-        record: EquipmentRecord | None = None,
-        tagger: TimeTagger.TimeTagger | None = None,
-    ) -> None:
-        """Perform a triggered time-interval analysis measurement.
-
-        The start-stop time differences are used to calculate amplitudes and the
-        timestamp of each amplitude is relative to the rising edge of the trigger signal.
-
-        Args:
-            start: The start channel.
-            stop: The stop channel.
             trigger: The trigger channel.
+        """
+        if gate is not None and trigger is not None:
+            msg = "Cannot specify both a gate and a trigger channel"
+            raise ValueError(msg)
+
+        self._start: Channel = Channel(start) if isinstance(start, int) else start
+        self._stop: Channel = Channel(stop) if isinstance(stop, int) else stop
+        self._gate: Channel | None = None
+        self._trigger: Channel | None = None
+
+        self._measurement: TimeTag
+        if gate is not None:
+            self._gate = Channel(gate, frequency=1) if isinstance(gate, int) else gate
+            self._measurement = TimeTagGated(
+                events=[self._start, self._stop], gate=self._gate, duration=duration, record=record, tagger=tagger
+            )
+        elif trigger is not None:
+            self._trigger = Channel(trigger, frequency=1) if isinstance(trigger, int) else trigger
+            self._measurement = TimeTagTriggered(
+                events=[self._start, self._stop], trigger=self._trigger, duration=duration, record=record, tagger=tagger
+            )
+        else:
+            self._measurement = TimeTag([self._start, self._stop], duration=duration, record=record, tagger=tagger)
+
+    @staticmethod
+    def create_channel(
+        number: int, *, deadtime: int = 2000, delay: int = 0, frequency: float = 3e6, level: float = 0.5
+    ) -> Channel:
+        """Create a new channel for a time-tag measurement.
+
+        Args:
+            number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
+                a negative value corresponds to timestamping an event on a falling edge. See the manual from
+                Swabian Instruments for more details.
 
         Keyword Args:
-            duration: The expected duration (in seconds) that measurement events will occur. The
-                time before the rising edge of the trigger pulse shall not be included in the duration.
-            record: The equipment record. If specified and `tagger` is not specified, then the
-                serial number in the record will be used to connect to a specific `TimeTagger`.
-            tagger: A `TimeTagger` instance. If not specified, a new instance is created.
-        """
-        if isinstance(start, int):
-            start = Channel(start)
-        if isinstance(stop, int):
-            stop = Channel(stop)
-        if isinstance(trigger, int):
-            trigger = Channel(trigger, frequency=1)
-        self._start_channel = start.number
-        self._stop_channel = stop.number
-        super().__init__(events=[start, stop], trigger=trigger, duration=duration, record=record, tagger=tagger)
+            deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
+                by the internal clock period (which is 2000 ps for Time Tagger Ultra).
+            delay: Additional delay (in picoseconds) to add to the timestamp of every event on this channel.
+            frequency: The expected maximum number of events (on this channel) per second during a measurement.
+            level: Signal level (in Volts) that, when exceeded, defines an event.
 
-    def intervals(
-        self, *, debug: bool = False, timeout: float | None = None
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+        Returns:
+            The time-tag channel.
+        """
+        return Channel(number, deadtime=deadtime, delay=delay, frequency=frequency, level=level)
+
+    def data(self, *, timeout: float | None = None) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Get the time-interval data.
+
+        Only considers a start event followed by a stop event as a valid time interval.
 
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
-            debug: Whether to print the runtime and the number of events to the terminal.
             timeout: The maxmimum number of seconds to wait for the measurement to be done.
                 If `None`, wait forever.
 
         Returns:
             A tuple of two numpy array's (times, amplitudes).
 
-            * `times`: Times (in seconds) of `start` events relative to the rising edge of the trigger signal.
-            * `ampltiudes`: Differences (in seconds) between the `start` and `stop` timestamps.
+            * `times`: Times (in seconds) of `start` events relative to the first timestamp event.
+            * `ampltiudes`: Differences (in seconds) between the `stop` and `start`  timestamps.
         """
-        status = self.wait(debug=debug, timeout=timeout)
+        status = self._measurement.wait(timeout=timeout)
         if not status.success:
             raise RuntimeError(status.message)
-        channels = self.channels
-        assert channels[0] == self._trigger_channel  # noqa: S101
-        return _intervals(
-            start=self._start_channel,
-            stop=self._stop_channel,
-            channels=channels,
-            timestamps=self.timestamps,
-        )
 
+        start = self._start.number
+        stop = self._stop.number
+        channels = self._measurement.channels
+        timestamps = self._measurement.timestamps
 
-def _intervals(
-    *, start: int, stop: int, channels: NDArray[np.int8], timestamps: NDArray[np.int64]
-) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-    """Get the time-interval data.
+        if self._gate is not None:
+            if channels[0] != self._gate.number:
+                msg = f"The first channel, {channels[0]}, is not equal to the gate channel, {self._gate.number}"
+                raise RuntimeError(msg)
+            if channels[-1] != -self._gate.number:
+                msg = f"The last channel, {channels[0]}, is not equal to the gate channel, {-self._gate.number}"
+                raise RuntimeError(msg)
 
-    Only considers a start event followed by a stop event as a valid time interval.
-    """
-    # arbitrarily chose to append 100 since it cannot be a valid TimeTagger channel but it is a valid int8
-    diff = np.diff(channels, append=100)
-    # must also check "channels==start" in addition to the "stop-start" difference since "start-trigger",
-    # "stop-trigger", "abs(start-gate)", "abs(stop-gate)" may also equal the "stop-start" difference
-    start_indices = np.logical_and(channels == start, diff == stop - start)
-    stop_indices = np.roll(start_indices, 1)
-    t1 = timestamps[start_indices]
-    t2 = timestamps[stop_indices]
-    amplitudes = 1e-12 * (t1 - t2).astype(np.float64)
-    times = 1e-12 * (t1 - timestamps[0]).astype(np.float64)
-    return times, amplitudes
+        if self._trigger is not None and channels[0] != self._trigger.number:
+            msg = f"The first channel, {channels[0]}, is not equal to the trigger channel, {self._trigger.number}"
+            raise RuntimeError(msg)
+
+        # arbitrarily chose to append 100 since it cannot be a valid TimeTagger channel but it is a valid int8
+        diff = np.diff(channels, append=100)
+
+        # must also check "channels==start" in addition to the "stop-start" difference since "start-trigger",
+        # "stop-trigger", "abs(start-gate)", "abs(stop-gate)" may also equal the "stop-start" difference
+        start_indices = np.logical_and(channels == start, diff == stop - start)
+        stop_indices = np.roll(start_indices, 1)
+
+        t1 = timestamps[start_indices]
+        t2 = timestamps[stop_indices]
+        if t1.size == 0 or t2.size == 0:
+            return np.array([], dtype=np.float64), np.array([], dtype=np.float64)
+
+        amplitudes = 1e-12 * (t1 - t2).astype(np.float64)
+        times = 1e-12 * (t1 - timestamps[0]).astype(np.float64)
+        return times, amplitudes
+
+    def start(self) -> None:
+        """Start a measurement.
+
+        This method does not block the calling routine. It will return as soon as the measurement is running.
+        """
+        return self._measurement.start()
