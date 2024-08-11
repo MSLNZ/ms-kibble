@@ -54,6 +54,7 @@ class Channel:
             by the internal clock period (which is 2000 ps for Time Tagger Ultra).
         delay: Additional delay (in picoseconds) to add to the timestamp of every event on this channel.
         frequency: The expected maximum number of events (on this channel) per second during a measurement.
+            This value helps to determine the size of the numpy arrays to initialise.
         level: Signal level (in Volts) that, when exceeded, defines an event.
     """
 
@@ -271,6 +272,15 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
     @property
     def duration(self) -> float:
         """The expected number of seconds that a measurement will take.
+
+        The duration shall not include the time before a gate nor a trigger event
+        (if used). Only the expected duration of the measurement of interest need
+        be specified.
+
+        For a triggered measurement, the `duration` corresponds to the measurement
+        time after the trigger edge. For a gated measurement, the `duration`
+        corresponds to the width of the gate pulse. The `duration` value also helps
+        to determine the size of the numpy arrays to initialise.
 
         Returns:
             The measurement duration.
