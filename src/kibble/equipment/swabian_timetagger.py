@@ -293,25 +293,6 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         # type for the "time" tags that are received in self.process().
         self._timestamps = np.empty(size, dtype=np.int64)
 
-    def data(self) -> NDArray[Any]:
-        """Return the raw data for all events during the measurement.
-
-        Returns:
-            A structured numpy array with the following field names:
-
-            * `channel` (int): the channel number of each event.
-            * `timestamp` (int): the timestamp (in picoseconds) of each event.
-        """
-        with self.mutex:
-            dtype = [
-                ("channel", self._channels.dtype),
-                ("timestamp", self._timestamps.dtype),
-            ]
-            array = np.empty(self._events, dtype=dtype)
-            array["channel"] = self._channels[: self._events]
-            array["timestamp"] = self._timestamps[: self._events]
-            return array
-
     def process(self, tags: NDArray[Any], begin_time: int, end_time: int) -> None:
         """Callback function to process a data stream from the time tagger.
 
