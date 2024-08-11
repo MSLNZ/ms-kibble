@@ -219,22 +219,23 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         """
         self._tagger.setStreamBlockSize(events, latency)
 
-    def count_rate(self, channel: int) -> float | None:
+    def count_rate(self, channel: int) -> float:
         """Return the count rate for a particular channel.
 
         Args:
             channel: A measurement channel.
 
         Returns:
-            The count rate or `None` if it cannot be determined (too few data points).
+            The count rate. Can be NaN if there are not enough events for the
+            specified channel to calculate the rate.
         """
         t = self.timestamps[self.channels == channel]
         if t.size < 1:
-            return None
+            return float("nan")
 
         dt = t[-1] - t[0]
         if dt == 0:
-            return None
+            return float("nan")
 
         return float(t.size / (1e-12 * dt))
 
