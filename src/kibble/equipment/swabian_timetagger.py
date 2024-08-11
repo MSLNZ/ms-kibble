@@ -366,7 +366,8 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
         Args:
             debug: Whether to print the runtime and the number of events to the terminal.
-            timeout: The maxmimum number of seconds to wait. If `None`, wait forever.
+            timeout: The maxmimum number of seconds to wait for the measurement to be done.
+                If `None`, wait forever.
 
         Returns:
             The status when the measurement finished.
@@ -593,20 +594,23 @@ class GatedTIA(TimeTagGated):
         self._stop_channel = stop.number
         super().__init__(events=[start, stop], gate=gate, duration=duration, record=record, tagger=tagger)
 
-    def intervals(self, *, debug: bool = False, timeout: float | None = None) -> NDArray[Any]:
+    def intervals(
+        self, *, debug: bool = False, timeout: float | None = None
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Get the time-interval data.
 
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
             debug: Whether to print the runtime and the number of events to the terminal.
-            timeout: The maxmimum number of seconds to wait. If `None`, wait forever.
+            timeout: The maxmimum number of seconds to wait for the measurement to be done.
+                If `None`, wait forever.
 
         Returns:
-            A structured numpy array with the following field names:
+            A tuple of two numpy array's (times, amplitudes).
 
-            * `time` (float): Times (in seconds) of `start` events relative to the rising edge of the gate signal.
-            * `ampltiude` (float): Difference between the `start` and `stop` timestamps.
+            * `times`: Times (in seconds) of `start` events relative to the rising edge of the gate signal.
+            * `ampltiudes`: Differences (in seconds) between the `start` and `stop` timestamps.
         """
         status = self.wait(debug=debug, timeout=timeout)
         if not status.success:
@@ -662,20 +666,23 @@ class TriggeredTIA(TimeTagTriggered):
         self._stop_channel = stop.number
         super().__init__(events=[start, stop], trigger=trigger, duration=duration, record=record, tagger=tagger)
 
-    def intervals(self, *, debug: bool = False, timeout: float | None = None) -> NDArray[Any]:
+    def intervals(
+        self, *, debug: bool = False, timeout: float | None = None
+    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Get the time-interval data.
 
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
             debug: Whether to print the runtime and the number of events to the terminal.
-            timeout: The maxmimum number of seconds to wait. If `None`, wait forever.
+            timeout: The maxmimum number of seconds to wait for the measurement to be done.
+                If `None`, wait forever.
 
         Returns:
-            A structured numpy array with the following field names:
+            A tuple of two numpy array's (times, amplitudes).
 
-            * `time` (float): Times (in seconds) of `start` events relative to the rising edge of the trigger signal.
-            * `ampltiude` (float): Difference between the `start` and `stop` timestamps.
+            * `times`: Times (in seconds) of `start` events relative to the rising edge of the trigger signal.
+            * `ampltiudes`: Differences (in seconds) between the `start` and `stop` timestamps.
         """
         status = self.wait(debug=debug, timeout=timeout)
         if not status.success:
@@ -690,7 +697,9 @@ class TriggeredTIA(TimeTagTriggered):
         )
 
 
-def _intervals(*, start: int, stop: int, channels: NDArray[np.int8], timestamps: NDArray[np.int64]) -> NDArray[Any]:
+def _intervals(
+    *, start: int, stop: int, channels: NDArray[np.int8], timestamps: NDArray[np.int64]
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Get the time-interval data.
 
     Only considers a start event followed by a stop event as a valid time interval.
@@ -703,7 +712,6 @@ def _intervals(*, start: int, stop: int, channels: NDArray[np.int8], timestamps:
     stop_indices = np.roll(start_indices, 1)
     t1 = timestamps[start_indices]
     t2 = timestamps[stop_indices]
-    data = np.empty(t1.size, dtype=[("time", np.float64), ("amplitude", np.float64)])
-    data["amplitude"] = 1e-12 * (t1 - t2)
-    data["time"] = 1e-12 * (t1 - timestamps[0])
-    return data
+    amplitudes = 1e-12 * (t1 - t2).astype(np.float64)
+    times = 1e-12 * (t1 - timestamps[0]).astype(np.float64)
+    return times, amplitudes
