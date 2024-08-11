@@ -47,7 +47,9 @@ class Channel:
     """A time-tagger channel to measure events.
 
     Args:
-        number: Channel number.
+        number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
+            a negative value corresponds to timestamping an event on a falling edge. See the manual from
+            Swabian Instruments for more details.
 
     Keyword Args:
         deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
@@ -247,7 +249,9 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         """Create a new channel for a time-tag measurement.
 
         Args:
-            number: Channel number.
+            number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
+                a negative value corresponds to timestamping an event on a falling edge. See the manual from
+                Swabian Instruments for more details.
 
         Keyword Args:
             deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
