@@ -12,25 +12,39 @@ import numpy as np
 try:
     import TimeTagger  # type: ignore  # noqa: PGH003
 except ModuleNotFoundError:
+    import os
+    import sys
 
-    class TimeTagger:  # type: ignore[no-redef]
-        """Mocked TimeTagger module."""
+    # Assume running on Windows
+    arch = "x64" if sys.maxsize > 2**32 else "x86"
+    sys.path.append(os.path.join(os.environ.get("TIMETAGGER_INSTALL_PATH", ""), "driver", arch))  # noqa: PTH118
+    try:
+        import TimeTagger  # type: ignore  # noqa: PGH003
+    except ModuleNotFoundError:
 
-        class CustomMeasurement:
-            """Mocked CustomMeasurement class."""
+        class TimeTagger:  # type: ignore[no-redef]
+            """Mocked TimeTagger module."""
 
-            def stop(self) -> None:
-                """Mocked stop method. Avoids AttributeError in __del__."""
+            class Resolution:
+                """Mocked Resolution enum."""
 
-        @staticmethod
-        def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # noqa: ARG004, N802
-            """Mocked createTimeTagger function."""
-            msg = (
-                "The Swabian Instruments TimeTagger module cannot be found.\n"
-                "Install it from https://www.swabianinstruments.com/time-tagger/downloads/\n"
-                "and ensure that the directory containing the TimeTagger module is available on sys.path"
-            )
-            raise ModuleNotFoundError(msg)
+                Standard = 0
+
+            class CustomMeasurement:
+                """Mocked CustomMeasurement class."""
+
+                def stop(self) -> None:
+                    """Mocked stop method. Avoids AttributeError in CustomMeasurement.__del__."""
+
+            @staticmethod
+            def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # noqa: ARG004, N802
+                """Mocked createTimeTagger function."""
+                msg = (
+                    "The Swabian Instruments TimeTagger module cannot be found.\n"
+                    "Install it from https://www.swabianinstruments.com/time-tagger/downloads/\n"
+                    "and ensure that the directory containing the TimeTagger module is available on sys.path"
+                )
+                raise ModuleNotFoundError(msg)
 
 
 if TYPE_CHECKING:
@@ -119,6 +133,8 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
                 gate/trigger pulse shall not be included in the duration.
             record: The equipment record. If specified and `tagger` is not specified, then the
                 serial number in the record will be used to connect to a specific `TimeTagger`.
+                A "resolution" key-value pair in `record.connection.properties` may be used to
+                set the resolution of the `TimeTagger` (i.e., for HighResA set resolution=1).
             tagger: A `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._is_array_overflow = False  # overflow on the numpy array?
@@ -129,8 +145,15 @@ class TimeTagMeasurement(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
         self._free_tagger = False
         if not tagger:
-            serial = "" if record is None else record.serial
-            tagger = TimeTagger.createTimeTagger(serial=serial)
+            if record is None:
+                serial, resolution = "", 0
+            else:
+                serial = record.serial
+                if record.connection is None:
+                    resolution = TimeTagger.Resolution.Standard
+                else:
+                    resolution = record.connection.properties.get("resolution", TimeTagger.Resolution.Standard)
+            tagger = TimeTagger.createTimeTagger(serial=serial, resolution=resolution)
             self._free_tagger = True
         self._tagger: TimeTagger.TimeTagger = tagger
         super().__init__(tagger)
