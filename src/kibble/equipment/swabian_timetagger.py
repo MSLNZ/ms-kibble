@@ -33,9 +33,6 @@ except ModuleNotFoundError:
             class CustomMeasurement:
                 """Mocked CustomMeasurement class."""
 
-                def stop(self) -> None:
-                    """Stop a measurement."""
-
             @staticmethod
             def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # noqa: ARG004, N802
                 """Mocked createTimeTagger function."""
@@ -342,6 +339,10 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         self._tagger.clearOverflows()
         self.clear()
         super().start()
+
+    def stop(self) -> None:
+        """Stop a measurement."""
+        super().stop()
 
     def tagger(self) -> TimeTagger.TimeTagger:
         """Return the time-tagger instance."""
