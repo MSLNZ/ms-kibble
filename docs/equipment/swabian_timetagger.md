@@ -1,3 +1,3 @@
 ::: kibble.equipment.swabian_timetagger
     options:
-      filters: ["!^_", "!^on", "!(^process)"]
+      filters: ["!^_", "!(on_start)", "!(process)"]
