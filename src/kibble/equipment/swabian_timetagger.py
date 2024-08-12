@@ -644,7 +644,7 @@ class TimeIntervalAnalyser:
         """
         return Channel(number, deadtime=deadtime, delay=delay, frequency=frequency, level=level)
 
-    def data(self, *, timeout: float | None = None) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    def time_interval(self, *, timeout: float | None = None) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Get the time-interval data.
 
         Only considers a start event followed by a stop event as a valid time interval.
