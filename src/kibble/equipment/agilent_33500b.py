@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from typing import Literal
 
-    from msl.equipment import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
 
 
 class Agilent33500B:

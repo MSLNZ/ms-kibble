@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from typing import Literal
 
     import numpy.typing as npt
-    from msl.equipment import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
 
 
 class Agilent3458A:

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Any
 
-    from msl.equipment import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
 
 
 @dataclass

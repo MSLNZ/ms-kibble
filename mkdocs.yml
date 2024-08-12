@@ -1,0 +1,89 @@
+site_name: MSL Kibble
+site_description: MSL Kibble Balance software.
+copyright: Copyright &copy; 2024 Measurement Standards Laboratory of New Zealand
+repo_url: https://github.com/MSLNZ/ms-kibble
+
+theme:
+  name: material
+  language: en
+  favicon: assets/images/favicon.ico
+  features:
+    - content.code.copy
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+
+watch: [src, examples]
+
+nav:
+  - Overview: index.md
+  - Equipment:
+      - Agilent3458A: equipment/agilent_3458a.md
+      - Agilent33500b: equipment/agilent_33500b.md
+      - PulseBlaster: equipment/spincore_pulseblaster.md
+      - TimeTagger: equipment/swabian_timetagger.md
+  - About:
+    - Release Notes: about/release-notes.md
+    - License: about/license.md
+
+markdown_extensions:
+  - attr_list  # enables: [link](url){:target="_blank"}
+  - pymdownx.snippets:  # enables: --8<--
+      check_paths: true
+  - toc:
+      permalink: "¤"
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          import:
+            - url: https://docs.python.org/3/objects.inv
+              domains: [std, py]
+            - https://msl-equipment.readthedocs.io/en/latest/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
+          options:
+            # General
+            show_source: false
+
+            # Headings
+            show_root_toc_entry: false
+
+            # Members
+            filters: ["!^_"]
+            inherited_members: true
+
+            # Docstrings
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+
+            # Signatures
+            separate_signature: true
+
+extra:
+  social:
+  - icon: fontawesome/brands/github
+    link: https://github.com/MSLNZ/ms-kibble

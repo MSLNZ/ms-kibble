@@ -34,7 +34,7 @@ except ModuleNotFoundError:
                 """Mocked CustomMeasurement class."""
 
                 def stop(self) -> None:
-                    """Mocked stop method. Avoids AttributeError in CustomMeasurement.__del__."""
+                    """Stop a measurement."""
 
             @staticmethod
             def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # noqa: ARG004, N802
@@ -52,7 +52,7 @@ if TYPE_CHECKING:
     from types import TracebackType
     from typing import Any, Self
 
-    from msl.equipment import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
     from numpy.typing import NDArray
 
 
@@ -64,8 +64,6 @@ class Channel:
         number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
             a negative value corresponds to timestamping an event on a falling edge. See the manual from
             Swabian Instruments for more details.
-
-    Keyword Args:
         deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
             by the internal clock period (which is 2000 ps for Time Tagger Ultra).
         delay: Additional delay (in picoseconds) to add to the timestamp of every event on this channel.
@@ -91,9 +89,9 @@ class StatusCode(IntEnum):
         OVERFLOW: `2`
     """
 
-    SUCCESS = 0
-    TIMEOUT = 1
-    OVERFLOW = 2
+    SUCCESS: int = 0
+    TIMEOUT: int = 1
+    OVERFLOW: int = 2
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -126,16 +124,15 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
         Args:
             channels: The channels involved in the measurement.
-
-        Keyword Args:
             duration: The expected duration (in seconds) that measurement events will occur.
                 For gated and triggered measurements, the time before the rising edge of the
                 gate/trigger pulse shall not be included in the duration.
             record: The equipment record. If specified and `tagger` is not specified, then the
-                serial number in the record will be used to connect to a specific `TimeTagger`.
-                A "resolution" key-value pair in `record.connection.properties` may be used to
-                set the resolution of the `TimeTagger` (i.e., for HighResA set resolution=1).
-            tagger: A `TimeTagger` instance. If not specified, a new instance is created.
+                serial number in the `record` will be used to connect to a specific `TimeTagger`.
+                A _resolution_ key-value pair in
+                [record.connection.properties][msl.equipment.record_types.ConnectionRecord.properties]
+                may be used to set the resolution of the `TimeTagger` (i.e., for HighResA set `resolution=1`).
+            tagger: A Swabian `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._is_array_overflow = False  # overflow on the numpy array?
         self._is_tagger_overflow = False  # overflow on the time-tagger?
@@ -239,7 +236,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         Depending on which of the two parameters is exceeded first, the number of
         events to `process()` in the data stream is adjusted accordingly.
 
-        Keyword Args:
+        Args:
             events: Maximum number of events before `process()` is called (256 - 32M).
             latency: Maximum latency (in milliseconds) before `process` is called (1 to 10000).
         """
@@ -275,8 +272,6 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
             number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
                 a negative value corresponds to timestamping an event on a falling edge. See the manual from
                 Swabian Instruments for more details.
-
-        Keyword Args:
             deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
                 by the internal clock period (which is 2000 ps for Time Tagger Ultra).
             delay: Additional delay (in picoseconds) to add to the timestamp of every event on this channel.
@@ -284,7 +279,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
             level: Signal level (in Volts) that, when exceeded, defines an event.
 
         Returns:
-            The time-tag channel.
+            A time-tag channel.
         """
         return Channel(number, deadtime=deadtime, delay=delay, frequency=frequency, level=level)
 
@@ -357,7 +352,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         soon as the measurement is running.
 
         See Also:
-            [wait][kibble.equipment.swabian_timetagger.TimeTagMeasurement.wait]
+            [wait][kibble.equipment.swabian_timetagger.TimeTag.wait]
         """
         self._is_array_overflow = False
         self._is_tagger_overflow = False
@@ -388,7 +383,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
-            timeout: The maxmimum number of seconds to wait for the measurement to be done.
+            timeout: The maximum number of seconds to wait for the measurement to be done.
                 If `None`, wait forever.
 
         Returns:
@@ -399,6 +394,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
             if self.done():
                 self.stop()
                 return Status(code=StatusCode.SUCCESS, message="Success", success=True)
+
             if (timeout is not None) and (perf_counter() - t0 > timeout):
                 self.stop()
                 return Status(
@@ -406,9 +402,11 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
                     message=f"Time-tag measurement timeout after {timeout} seconds",
                     success=False,
                 )
+
             if self._is_tagger_overflow:
                 self.stop()
                 return Status(code=StatusCode.OVERFLOW, message="TimeTagger has a buffer overflow", success=False)
+
             if self._is_array_overflow:
                 self.stop()
                 return Status(
@@ -418,7 +416,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
                     success=False,
                 )
 
-            sleep(self._duration * 0.05)
+            sleep(0.01)
 
 
 class TimeTagGated(TimeTag):
@@ -439,14 +437,12 @@ class TimeTagGated(TimeTag):
 
         Args:
             events: The channel(s) that contain the events to measure.
-            gate: The gate channel. The `frequency` attribute is ignored.
-
-        Keyword Args:
+            gate: The gate channel. The [frequency][kibble.equipment.swabian_timetagger.Channel] attribute is ignored.
             duration: The expected duration (in seconds) that measurement events will occur. See
-                [duration][kibble.equipment.swabian_timetagger.TimeTagMeasurement.duration] for more details.
+                [duration][kibble.equipment.swabian_timetagger.TimeTag.duration] for more details.
             record: The equipment record. See the constructor of
-                [TimeTagMeasurement][kibble.equipment.swabian_timetagger.TimeTagMeasurement] for more details.
-            tagger: A `TimeTagger` instance. If not specified, a new instance is created.
+                [TimeTag][kibble.equipment.swabian_timetagger.TimeTag] for more details.
+            tagger: A Swabian `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._is_gated = False
         self._gate_channel = gate.number
@@ -515,14 +511,13 @@ class TimeTagTriggered(TimeTag):
 
         Args:
             events: The channel(s) that contain the events to measure.
-            trigger: The trigger channel. The `frequency` attribute is ignored.
-
-        Keyword Args:
+            trigger: The trigger channel. The [frequency][kibble.equipment.swabian_timetagger.Channel]
+                attribute is ignored.
             duration: The expected duration (in seconds) that measurement events will occur. See
-                [duration][kibble.equipment.swabian_timetagger.TimeTagMeasurement.duration] for more details.
+                [duration][kibble.equipment.swabian_timetagger.TimeTag.duration] for more details.
             record: The equipment record. See the constructor of
-                [TimeTagMeasurement][kibble.equipment.swabian_timetagger.TimeTagMeasurement] for more details.
-            tagger: A `TimeTagger` instance. If not specified, a new instance is created.
+                [TimeTag][kibble.equipment.swabian_timetagger.TimeTag] for more details.
+            tagger: A Swabian `TimeTagger` instance. If not specified, a new instance is created.
         """
         self._finished_time = 0  # timestamp, in picoseconds, when the measurement is done
         self._trigger_channel: int = trigger.number
@@ -597,14 +592,12 @@ class TimeIntervalAnalyser:
         Args:
             start: The start channel.
             stop: The stop channel.
-
-        Keyword Args:
             duration: The expected duration (in seconds) that measurement events will occur. See
-                [duration][kibble.equipment.swabian_timetagger.TimeTagMeasurement.duration] for more details.
+                [duration][kibble.equipment.swabian_timetagger.TimeTag.duration] for more details.
             gate: The gate channel.
             record: The equipment record. See the constructor of
-                [TimeTagMeasurement][kibble.equipment.swabian_timetagger.TimeTagMeasurement] for more details.
-            tagger: A `TimeTagger` instance. If not specified, a new instance is created.
+                [TimeTag][kibble.equipment.swabian_timetagger.TimeTag] for more details.
+            tagger: A Swabian `TimeTagger` instance. If not specified, a new instance is created.
             trigger: The trigger channel.
         """
         if gate is not None and trigger is not None:
@@ -640,8 +633,6 @@ class TimeIntervalAnalyser:
             number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
                 a negative value corresponds to timestamping an event on a falling edge. See the manual from
                 Swabian Instruments for more details.
-
-        Keyword Args:
             deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
                 by the internal clock period (which is 2000 ps for Time Tagger Ultra).
             delay: Additional delay (in picoseconds) to add to the timestamp of every event on this channel.
@@ -649,7 +640,7 @@ class TimeIntervalAnalyser:
             level: Signal level (in Volts) that, when exceeded, defines an event.
 
         Returns:
-            The time-tag channel.
+            A time-tag channel.
         """
         return Channel(number, deadtime=deadtime, delay=delay, frequency=frequency, level=level)
 
@@ -661,14 +652,14 @@ class TimeIntervalAnalyser:
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
-            timeout: The maxmimum number of seconds to wait for the measurement to be done.
+            timeout: The maximum number of seconds to wait for the measurement to be done.
                 If `None`, wait forever.
 
         Returns:
             A tuple of two numpy array's (times, amplitudes).
 
-            * `times`: Times (in seconds) of `start` events relative to the first timestamp event.
-            * `ampltiudes`: Differences (in seconds) between the `stop` and `start`  timestamps.
+                * `times`: Times (in seconds) of `start` events relative to the first timestamp event.
+                * `ampltiudes`: Differences (in seconds) between the `stop` and `start`  timestamps.
         """
         status = self._measurement.wait(timeout=timeout)
         if not status.success:
