@@ -61,8 +61,8 @@ class Channel:
     """A time-tagger channel to measure events.
 
     Args:
-        number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
-            a negative value corresponds to timestamping an event on a falling edge. See the manual from
+        number: Channel number. A positive value corresponds to a timestamp event on a rising edge,
+            a negative value corresponds to a timestamp event on a falling edge. See the manual from
             Swabian Instruments for more details.
         deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
             by the internal clock period (which is 2000 ps for Time Tagger Ultra).
@@ -166,7 +166,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         self._timestamps: NDArray[np.int64]
         self.duration = duration
 
-        self.finalize_init()  # Must be called when done initialising a CustomMeasurement
+        self.finalize_init()  # Must be called when done configuring a CustomMeasurement
         self.stop()  # However, finalize_init() automatically starts a measurement (which also calls self.on_start())
 
     def __del__(self) -> None:
@@ -269,8 +269,8 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         """Create a new channel for a time-tag measurement.
 
         Args:
-            number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
-                a negative value corresponds to timestamping an event on a falling edge. See the manual from
+            number: Channel number. A positive value corresponds to a timestamp event on a rising edge,
+                a negative value corresponds to a timestamp event on a falling edge. See the manual from
                 Swabian Instruments for more details.
             deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
                 by the internal clock period (which is 2000 ps for Time Tagger Ultra).
@@ -331,7 +331,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         No filtering is performed. All events are considered valid until the measurement is complete.
 
         Args:
-            tags: The time tags as a structred numpy array. Field names: type, missed_events, channel, time.
+            tags: The time tags as a structured numpy array. Field names: type, missed_events, channel, time.
             begin_time: The begin time of the data chunk.
             end_time: The end time of the data chunk.
         """
@@ -460,7 +460,7 @@ class TimeTagGated(TimeTag):
         """Callback function to process a data stream from the time tagger.
 
         Args:
-            tags: The time tags as a structred numpy array. Field names: type, missed_events, channel, time.
+            tags: The time tags as a structured numpy array. Field names: type, missed_events, channel, time.
             begin_time: The begin time of the data chunk.
             end_time: The end time of the data chunk.
         """
@@ -541,7 +541,7 @@ class TimeTagTriggered(TimeTag):
         """Callback function to process a data stream from the time tagger.
 
         Args:
-            tags: The time tags as a structred numpy array. Field names: type, missed_events, channel, time.
+            tags: The time tags as a structured numpy array. Field names: type, missed_events, channel, time.
             begin_time: The begin time of the data chunk.
             end_time: The end time of the data chunk.
         """
@@ -630,8 +630,8 @@ class TimeIntervalAnalyser:
         """Create a new channel for a time-tag measurement.
 
         Args:
-            number: Channel number. A positive value corresponds to timestamping an event on a rising edge,
-                a negative value corresponds to timestamping an event on a falling edge. See the manual from
+            number: Channel number. A positive value corresponds to a timestamp event on a rising edge,
+                a negative value corresponds to a timestamp event on a falling edge. See the manual from
                 Swabian Instruments for more details.
             deadtime: Dead time (in picoseconds) of the channel. The minimum dead time is defined
                 by the internal clock period (which is 2000 ps for Time Tagger Ultra).
