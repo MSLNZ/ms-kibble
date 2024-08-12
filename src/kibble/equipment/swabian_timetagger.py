@@ -188,7 +188,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
     def _cleanup(self) -> None:
         """Stop the measurement and release the TimeTagger object from memory."""
-        if not hasattr(self, "_free_tagger"):
+        if not hasattr(self, "_free_tagger") or not hasattr(self, "this"):
             return
 
         self.stop()
