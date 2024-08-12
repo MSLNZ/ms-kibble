@@ -179,25 +179,26 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
 
         return int(self.sdk.pb_inst_pbonly(flags, code, data, c_double(duration * 1e9)))
 
-    def configure_two_pulses(
+    def one_pulse_two_channels(
         self,
         *,
-        pulse1: int = 0,
-        pulse2: int = 1,
+        first: int = 0,
+        second: int = 1,
         width: float = 1e-3,
         delay: float = 0,
         single: bool = True,
         period: float | None = None,
     ) -> None:
-        """Configure a new ``PULSE_PROGRAM`` that creates two pulses.
+        """Configure a new ``PULSE_PROGRAM`` that creates one pulse on two channels.
 
         Args:
-            pulse1: The `bit#` to use for the first pulse.
-            pulse2: The `bit#` to use for the second pulse.
+            first: The `bit#` to use for the first pulse.
+            second: The `bit#` to use for the second pulse.
             width: The width, in seconds, of each pulse.
             delay: The delay, in seconds, of the second pulse.
             single: Whether the pulses are output in single-shot mode. If enabled,
-                the `trigger()` method must be called before the pulses are output.
+                the [trigger][kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger]
+                method must be called before the pulses are output.
             period: The time, in seconds, between the rising edge of the
                 first pulses. Only used if `single` is `False`.
         """
@@ -209,19 +210,19 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
 
         if delay == 0:
             total = width
-            start = self.add_instruction(bits=[pulse1, pulse2], duration=width)
+            start = self.add_instruction(bits=[first, second], duration=width)
         elif delay < width:
             d = max(width - delay, self.MIN_DURATION)
             total = delay + d + delay
-            start = self.add_instruction(bits=[pulse1], duration=delay)
-            self.add_instruction(bits=[pulse1, pulse2], duration=d)
-            self.add_instruction(bits=[pulse2], duration=delay)
+            start = self.add_instruction(bits=[first], duration=delay)
+            self.add_instruction(bits=[first, second], duration=d)
+            self.add_instruction(bits=[second], duration=delay)
         else:
             d = max(delay - width, self.MIN_DURATION)
             total = width + d + width
-            start = self.add_instruction(bits=[pulse1], duration=width)
+            start = self.add_instruction(bits=[first], duration=width)
             self.add_instruction(duration=d)
-            self.add_instruction(bits=[pulse2], duration=width)
+            self.add_instruction(bits=[second], duration=width)
 
         self.add_instruction(duration=self.MIN_DURATION)
         if single:

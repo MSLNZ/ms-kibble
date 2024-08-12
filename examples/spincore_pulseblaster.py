@@ -6,7 +6,7 @@ from kibble import PulseBlaster
 
 blaster = PulseBlaster(records["blaster"])
 
-blaster.configure_two_pulses(width=10e-6, delay=5e-6)
+blaster.one_pulse_two_channels(width=10e-6, delay=5e-6)
 
 while True:
     blaster.trigger()
