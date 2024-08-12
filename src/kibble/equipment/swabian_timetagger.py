@@ -583,7 +583,7 @@ class TimeIntervalAnalyser:
     ) -> None:
         """Perform a time-interval analysis measurement based on start-stop events.
 
-        The amplitudes are calculated as stop-start time differences and the time of each amplitude is relative to:
+        The intervals are calculated as stop-start time differences and the time of each interval is relative to:
 
         * the timestamp of the first start or stop event if neither gate nor trigger are specified
         * the first edge of the gate pulse, or
@@ -656,10 +656,10 @@ class TimeIntervalAnalyser:
                 If `None`, wait forever.
 
         Returns:
-            A tuple of two numpy array's (times, amplitudes).
+            A tuple of two numpy array's (times, intervals).
 
                 * `times`: Times (in seconds) of `start` events relative to the first timestamp event.
-                * `ampltiudes`: Differences (in seconds) between the `stop` and `start`  timestamps.
+                * `intervals`: Differences (in seconds) between the `stop` and `start`  timestamps.
         """
         status = self._measurement.wait(timeout=timeout)
         if not status.success:
@@ -695,9 +695,9 @@ class TimeIntervalAnalyser:
         if t1.size == 0 or t2.size == 0:
             return np.array([], dtype=np.float64), np.array([], dtype=np.float64)
 
-        amplitudes = 1e-12 * (t1 - t2).astype(np.float64)
+        intervals = 1e-12 * (t1 - t2).astype(np.float64)
         times = 1e-12 * (t1 - timestamps[0]).astype(np.float64)
-        return times, amplitudes
+        return times, intervals
 
     def start(self) -> None:
         """Start a measurement.

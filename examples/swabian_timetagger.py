@@ -18,6 +18,6 @@ tia.start()
 
 # When you have performed all other tasks, call tia.data()
 # This method will block until the measurement is done or until an error is raised
-times, amplitudes = tia.data()
+times, intervals = tia.data()
 print(times)
-print(amplitudes)
+print(intervals)
