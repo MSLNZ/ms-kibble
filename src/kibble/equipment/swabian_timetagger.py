@@ -361,6 +361,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
     def stop(self) -> None:
         """Stop a measurement."""
+        # Implemented so that this method appears in the documentation
         super().stop()
 
     def tagger(self) -> TimeTagger.TimeTagger:
