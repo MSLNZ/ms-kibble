@@ -106,6 +106,25 @@ class Status:
     success: bool
 
 
+@dataclass(frozen=True, kw_only=True)
+class Displacement:
+    """A displacement measurement.
+
+    Attributes:
+        beat_freq: Beat frequency, in MHz.
+        folding: Folding factor.
+        wavelength: Wavelength, in nm.
+        x: Corresponding time (in seconds) of each accumulated change in displacement.
+        y: Accumulated change in displacement.
+    """
+
+    beat_freq: float
+    folding: float
+    wavelength: float
+    x: NDArray[np.float64]
+    y: NDArray[np.float64]
+
+
 class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
     """Custom TimeTagger measurement."""
 
@@ -625,23 +644,24 @@ class TimeIntervalAnalyser:
         """
         return Channel(number, deadtime=deadtime, delay=delay, frequency=frequency, level=level)
 
-    def time_displacement(
+    def displacement(
         self,
         *,
-        beat_freq: float = 2.6,
-        folding: int = 1,
+        beat_freq: float | None = None,
+        folding: float = 1.0,
         subset: slice | None = None,
         timeout: float | None = None,
         wavelength: float = 633.24567,
-    ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
-        """Get the time-displacement data.
+    ) -> Displacement:
+        """Get the displacement data.
 
-        Only considers a start event followed by a stop event as valid data.
+        Follows the algorithm in [XXX](). Only considers a start event followed by a stop event as valid data.
 
         This is a blocking call and will not return until the measurement finishes or there is an error.
 
         Args:
-            beat_freq: Beat frequency, in MHz, of heterodyne beams.
+            beat_freq: Beat frequency, in MHz, of heterodyne beams. If `None`, calculate the beat
+                frequency as the average difference between neighbouring _start_ timestamps.
             folding: Beam path folding number.
             subset: Slice the data to only use a subset. For example, `subset=slice(5, -10)` will
                 ignore the first 5 values and the last 10 values from the displacement calculation.
@@ -650,23 +670,31 @@ class TimeIntervalAnalyser:
             wavelength: Wavelength, in nanometres, of laser.
 
         Returns:
-            A tuple of two numpy array's (time, displacement).
-
-                * `time`: Time (in seconds) for each displacement.
-                * `displacement`: Accumulated change in displacement. Follows the algorithm in [XXX]()
+            The displacement data.
         """
-        x_data, y_data = self.time_interval(timeout=timeout)
+        x, y = self.time_interval(timeout=timeout)
         if subset is not None:
-            x_data, y_data = x_data[subset], y_data[subset]
+            x, y = x[subset], y[subset]
 
-        phase = np.diff(y_data * 2 * np.pi * beat_freq * 1e6)
+        if beat_freq is None:
+            channels = self._measurement.channels
+            timestamps = self._measurement.timestamps
+            beat_freq = float(np.mean(1e6 / np.diff(timestamps[channels == self._start.number])))
+
+        phase = np.diff(y * 2.0 * np.pi * beat_freq * 1e6)
 
         # If change in phase exceeds pi, assume 0/2*pi was crossed
-        phase = np.where(np.abs(phase) > np.pi, phase - np.sign(phase) * 2 * np.pi, phase)
+        phase = np.where(np.abs(phase) > np.pi, phase - np.sign(phase) * 2.0 * np.pi, phase)
 
         # Accumulate change in displacement with time
-        y_displacement = np.cumsum(phase * (wavelength * 1e-9) / (4 * np.pi * folding))
-        return x_data[1 : len(y_displacement) + 1], y_displacement
+        y_displacement = np.cumsum(phase * (wavelength * 1e-9) / (4.0 * np.pi * folding))
+        return Displacement(
+            beat_freq=beat_freq,
+            folding=folding,
+            wavelength=wavelength,
+            x=x[1 : len(y_displacement) + 1],
+            y=y_displacement,
+        )
 
     def time_interval(self, *, timeout: float | None = None) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
         """Get the time-interval data.
