@@ -412,9 +412,10 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
                 self.stop()
                 return Status(
                     code=StatusCode.OVERFLOW,
-                    message="Buffered numpy array too small. Increase the expected frequency of a "
-                    "channel, increase the expected measurement duration, and/or check that the voltage "
-                    "level for each channel is appropriate for the noise in the signal.",
+                    message="Buffered numpy array too small. Try one (or more) of the following:\n"
+                    "- Increase the expected frequency of a channel\n"
+                    "- Check that the voltage level for each channel is appropriate for the noise in the signal\n"
+                    "- For a gated measurement, increase the expected measurement duration",
                     success=False,
                 )
 
