@@ -693,7 +693,7 @@ class TimeIntervalAnalyser:
             beat_freq=beat_freq,
             folding=folding,
             wavelength=wavelength,
-            x=x[1 : len(y_displacement) + 1],
+            x=x[1:],
             y=y_displacement,
         )
 
