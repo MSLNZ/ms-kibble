@@ -1,7 +1,6 @@
 """Agilent33500B example."""
 
 from equipment_register import records  # type: ignore[import-not-found]
-
 from kibble import Agilent33500B
 
 awg = Agilent33500B(records["awg"])
