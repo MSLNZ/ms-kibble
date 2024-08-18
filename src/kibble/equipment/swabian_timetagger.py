@@ -108,7 +108,7 @@ class Status:
 
 @dataclass(frozen=True, kw_only=True)
 class Displacement:
-    """A displacement measurement.
+    """The result from a displacement measurement.
 
     Attributes:
         beat_freq: Beat frequency, in MHz.
