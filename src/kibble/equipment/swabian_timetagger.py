@@ -573,17 +573,7 @@ class TimeTagTriggered(TimeTag):
 class TimeIntervalAnalyser:
     """A time-interval analysis measurement based on start-stop events."""
 
-    def __init__(
-        self,
-        *,
-        start: Channel | int,
-        stop: Channel | int,
-        duration: float = 10,
-        gate: Channel | int | None = None,
-        record: EquipmentRecord | None = None,
-        tagger: TimeTagger.TimeTagger | None = None,
-        trigger: Channel | int | None = None,
-    ) -> None:
+    def __init__(self, record: EquipmentRecord | None = None) -> None:
         """Perform a time-interval analysis measurement based on start-stop events.
 
         The intervals are calculated as stop-start time differences and the time of each interval is relative to:
@@ -593,13 +583,29 @@ class TimeIntervalAnalyser:
         * the trigger signal
 
         Args:
+            record: The equipment record. See the constructor of
+                [TimeTag][kibble.equipment.swabian_timetagger.TimeTag] for more details.
+        """
+        self._record = record
+
+    def configure(
+        self,
+        *,
+        start: Channel | int,
+        stop: Channel | int,
+        duration: float = 10,
+        gate: Channel | int | None = None,
+        tagger: TimeTagger.TimeTagger | None = None,
+        trigger: Channel | int | None = None,
+    ) -> None:
+        """Configure the time-interval analysis measurement.
+
+        Args:
             start: The start channel.
             stop: The stop channel.
             duration: The expected duration (in seconds) that measurement events will occur. See
                 [duration][kibble.equipment.swabian_timetagger.TimeTag.duration] for more details.
             gate: The gate channel.
-            record: The equipment record. See the constructor of
-                [TimeTag][kibble.equipment.swabian_timetagger.TimeTag] for more details.
             tagger: A Swabian `TimeTagger` instance. If not specified, a new instance is created.
             trigger: The trigger channel.
         """
@@ -616,15 +622,21 @@ class TimeIntervalAnalyser:
         if gate is not None:
             self._gate = Channel(gate, frequency=1) if isinstance(gate, int) else gate
             self._measurement = TimeTagGated(
-                events=[self._start, self._stop], gate=self._gate, duration=duration, record=record, tagger=tagger
+                events=[self._start, self._stop], gate=self._gate, duration=duration, record=self._record, tagger=tagger
             )
         elif trigger is not None:
             self._trigger = Channel(trigger, frequency=1) if isinstance(trigger, int) else trigger
             self._measurement = TimeTagTriggered(
-                events=[self._start, self._stop], trigger=self._trigger, duration=duration, record=record, tagger=tagger
+                events=[self._start, self._stop],
+                trigger=self._trigger,
+                duration=duration,
+                record=self._record,
+                tagger=tagger,
             )
         else:
-            self._measurement = TimeTag([self._start, self._stop], duration=duration, record=record, tagger=tagger)
+            self._measurement = TimeTag(
+                [self._start, self._stop], duration=duration, record=self._record, tagger=tagger
+            )
 
     @staticmethod
     def create_channel(
