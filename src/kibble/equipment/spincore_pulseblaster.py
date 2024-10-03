@@ -95,7 +95,7 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
         Args:
             record: The equipment record.
         """
-        self._closed = False
+        self._connected = False
         super().__init__(record=record, libtype="cdll")
 
         # initialize function declarations in spinapi64.dll
@@ -165,6 +165,7 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
         self.sdk.pb_select_board(0)
         self.sdk.pb_init()
         self.sdk.pb_core_clock(c_double(100))  # 100 MHz clock frequency
+        self._connected = True
 
     def _errcheck(self, result: int, func: Any, args: tuple[Any, ...]) -> int:  # noqa: ANN401
         if result >= 0:
@@ -267,10 +268,10 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
 
     def disconnect(self) -> None:
         """Disconnect from the PulseBlaster board."""
-        if self._closed:
+        if not self._connected:
             return
         self.sdk.pb_close()
-        self._closed = True
+        self._connected = False
 
     def reset(self) -> None:
         """Stops the output of board and resets the PulseBlaster."""
