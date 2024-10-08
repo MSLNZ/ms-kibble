@@ -766,9 +766,14 @@ class TimeIntervalAnalyser:
         times = 1e-12 * (t1 - timestamps[0]).astype(np.float64)
         return times, intervals
 
-    def start(self) -> None:
+    def start(self, *, delay: float = 0.02) -> None:
         """Start a measurement.
 
-        This method does not block the calling routine. It will return as soon as the measurement is running.
+        This method does not block the calling routine. It will return after `delay` seconds.
+
+        Args:
+            delay: The number of seconds to wait before returning to the calling program.
+                A delay is required for the TimeTagger firmware to process the start request.
         """
-        return self._measurement.start()
+        self._measurement.start()
+        sleep(delay)
