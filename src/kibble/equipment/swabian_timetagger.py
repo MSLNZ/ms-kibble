@@ -766,7 +766,7 @@ class TimeIntervalAnalyser:
         times = 1e-12 * (t1 - timestamps[0]).astype(np.float64)
         return times, intervals
 
-    def start(self, *, delay: float = 0.02) -> None:
+    def start(self, *, delay: float = 0.05) -> None:
         """Start a measurement.
 
         This method does not block the calling routine. It will return after `delay` seconds.
