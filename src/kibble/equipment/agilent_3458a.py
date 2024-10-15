@@ -53,6 +53,7 @@ class Agilent3458A:
         range: float = 10,  # noqa: A002
         nsamples: int = 10,
         aperature: float = 0.01,
+        sampling_time: float = 0.02,
         auto_zero: Literal["ONCE", "ON", "OFF"] = "ONCE",
         trigger: Literal["IMMEDIATE", "BUS", "EXTERNAL"] = "IMMEDIATE",
         edge: Literal["FALLING"] = "FALLING",
@@ -66,6 +67,7 @@ class Agilent3458A:
             range: The range to use for the measurement.
             nsamples: The number of samples to acquire after a trigger event.
             aperature: The A/D converter integration time in seconds.
+            sampling_time: The sampling time in seconds. Sampling time cannot be shorter than aperture time.
             auto_zero: The auto-zero mode. Either ONCE, ON or OFF.
             trigger: The trigger mode. Either IMMEDIATE, BUS or EXTERNAL.
             edge: The trigger edge (only used if `trigger` is EXTERNAL).
@@ -133,12 +135,17 @@ class Agilent3458A:
             msg = f"Too many samples requested, {self._nreadings}. Must be <= 16,777,215"
             raise ValueError(msg)
 
+        if sampling_time < aperature:
+            msg = f"Sampling time cannot be shorter than aperture time."
+            raise ValueError(msg)
+
         self._cxn.write(
             f"TARM HOLD;"
             f"TRIG {trig_event};"
             f"MEM FIFO;"
             f"FUNC {function},{range};"
             f"APER {aperature};"
+            f"TIMER {sampling_time};"
             f"AZERO {auto_zero};"
             f"NRDGS {nsamples},AUTO;"
             f"DELAY {delay or 0};"
