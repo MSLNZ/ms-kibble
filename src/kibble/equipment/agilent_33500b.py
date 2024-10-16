@@ -90,13 +90,19 @@ class Agilent33500B:
         channel: int,
         *,
         load: float | None = 50,
+        amplitude: float = 0.2,
+        offset: float = 1,
+        file = "INT:\\ARB_004.arb"
     ) -> None:
-        """Configure a SINUSOID waveform for a particular channel.
+        """Configure an arbitrary waveform for a particular channel.
 
         Args:
             channel: The channel number to configure.
             load: The load termination, in Ohms. In the range 1 to 10 kOhm,
                 or `None` for infinite (High Z).
+            file: file name for the arbitrary waveform to be saved.
+            amplitude: The amplitude of the waveform.
+            offset: The offset of the waveform.
         """
         if channel not in [1, 2]:
             msg = f"Channel must be either 1 or 2, got {channel}"
@@ -108,10 +114,16 @@ class Agilent33500B:
 
         self._cxn.write(
             f":OUTPUT{channel}:LOAD {load or 'INFINITY'};"  # OUTPUT must come before SOURCE
-            f":SOURCE{channel}:FUNCTION:ARB:SRATE 10E3;"
-            f":SOURCE{channel}:FUNCTION:ARB:PTPEAK 10;"
-            f":SOURCE{channel}:DATA:ARB dc_ramp, 0.1,0.1,0.1,0.2,0.2,0.2,0.2,0.5;"
-            f":SOURCE{channel}:FUNCTION:ARB dc_ramp;"
+            f":SOURCE{channel}:FUNCTION:ARB:SRATE 10;"
+            f":SOURCE{channel}:FUNCTION:ARB:PTPEAK 2;"
+            f":SOURCE{channel}:VOLT {amplitude};"
+            f":SOURCE{channel}:VOLT:OFFSET {offset};"
+            f":SOURCE{channel}:DATA:ARB dc_ramp, 0.1,0.5,0.1,0.2,0.2,0.2,0.2,0.5, 0.7, 0.5, 0.1;"
+            f":SOURCE{channel}:FUNCTION:ARB dc_ramp;" 
+            f":MMEM:STORE:DATA \"{file}\";"
+            f":MMEM:LOAD:DATA \"{file}\";"
+            f":SOURCE{channel}:FUNCTION ARB ;"
+            f":SOURCE{channel}:FUNCTION:ARB \"{file}\" ;"
 
 
         )
