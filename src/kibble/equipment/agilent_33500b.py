@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+import numpy as np
 
 if TYPE_CHECKING:
     from typing import Literal
@@ -90,9 +91,12 @@ class Agilent33500B:
         channel: int,
         *,
         load: float | None = 50,
-        amplitude: float = 0.2,
-        offset: float = 1,
-        file = "INT:\\ARB_004.arb"
+        sample_rate: float = 50,
+        pt_peak: float = 0.1,
+        amplitude: float = 1,
+        offset: float = 0.2,
+        data: list,
+        file = "INT:\\ARB_003.arb",
     ) -> None:
         """Configure an arbitrary waveform for a particular channel.
 
@@ -101,8 +105,11 @@ class Agilent33500B:
             load: The load termination, in Ohms. In the range 1 to 10 kOhm,
                 or `None` for infinite (High Z).
             file: file name for the arbitrary waveform to be saved.
-            amplitude: The amplitude of the waveform.
+            sample_rate: Sample rate of the arbitrary waveform
+            pt_peak: peak of the arbitrary waveform.
+            amplitude: amplitude of the waveform
             offset: The offset of the waveform.
+            data: arbitrary input data by user, the values have to be [-1, 1], input as a list.
         """
         if channel not in [1, 2]:
             msg = f"Channel must be either 1 or 2, got {channel}"
@@ -112,13 +119,16 @@ class Agilent33500B:
             msg = f"The terminal load must be between 1 and 10 kOhm or None, got {load}"
             raise ValueError(msg)
 
+        data = str(data)
+        data = data.replace('[', '').replace(']', '')
+
         self._cxn.write(
             f":OUTPUT{channel}:LOAD {load or 'INFINITY'};"  # OUTPUT must come before SOURCE
-            f":SOURCE{channel}:FUNCTION:ARB:SRATE 10;"
-            f":SOURCE{channel}:FUNCTION:ARB:PTPEAK 2;"
+            f":SOURCE{channel}:FUNCTION:ARB:SRATE {sample_rate};"
+            f":SOURCE{channel}:FUNCTION:ARB:PTPEAK {pt_peak};"
             f":SOURCE{channel}:VOLT {amplitude};"
             f":SOURCE{channel}:VOLT:OFFSET {offset};"
-            f":SOURCE{channel}:DATA:ARB dc_ramp, 0.1,0.5,0.1,0.2,0.2,0.2,0.2,0.5, 0.7, 0.5, 0.1;"
+            f":SOURCE{channel}:DATA:ARB dc_ramp, {data};"
             f":SOURCE{channel}:FUNCTION:ARB dc_ramp;" 
             f":MMEM:STORE:DATA \"{file}\";"
             f":MMEM:LOAD:DATA \"{file}\";"
