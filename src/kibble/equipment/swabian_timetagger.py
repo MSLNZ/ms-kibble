@@ -471,29 +471,32 @@ class TimeTagGated(TimeTag):
         if not self._tags_okay(tags):
             return
 
-        if self._is_gated:
-            # Check for falling edge of GATE signal
-            gate_indices = tags["channel"] == -self._gate_channel
+        # Check for rising edge of GATE signal
+        start_time = None
+        if not self._is_gated:
+            indices = tags["channel"] == self._gate_channel
+            if not np.any(indices):
+                return
+            self._is_gated = True
+            start_time = tags[indices]["time"][0]
+
+        # Check for falling edge of GATE signal
+        stop_time = None
+        indices = tags["channel"] == -self._gate_channel
+        if np.any(indices):
+            self._is_gated = False
+            self._is_done = True
+            stop_time = tags[indices]["time"][0]
+
+        # Filter valid time tags
+        if start_time is not None and stop_time is not None:
+            self._insert_tags(tags[np.logical_and(tags["time"] >= start_time, tags["time"] <= stop_time)])
+        elif start_time is not None:
+            self._insert_tags(tags[tags["time"] >= start_time])
+        elif stop_time is not None:
+            self._insert_tags(tags[tags["time"] <= stop_time])
         else:
-            # Check for rising edge of GATE signal
-            gate_indices = tags["channel"] == self._gate_channel
-
-        gated_tags = None
-        if np.any(gate_indices):
-            if self._is_gated:
-                self._is_gated = False
-                self._is_done = True
-                stop_time = tags[gate_indices]["time"][0]
-                gated_tags = tags[tags["time"] <= stop_time]
-            else:
-                self._is_gated = True
-                start_time = tags[gate_indices]["time"][0]
-                gated_tags = tags[tags["time"] >= start_time]
-        elif self._is_gated:
-            gated_tags = tags
-
-        if gated_tags is not None:
-            self._insert_tags(gated_tags)
+            self._insert_tags(tags)
 
 
 class TimeTagTriggered(TimeTag):
