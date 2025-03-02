@@ -65,16 +65,16 @@ class Code(IntEnum):
         RTI: 9
     """
 
-    CONTINUE: int = 0
-    STOP: int = 1
-    LOOP: int = 2
-    END_LOOP: int = 3
-    JSR: int = 4
-    RTS: int = 5
-    BRANCH: int = 6
-    LONG_DELAY: int = 7
-    WAIT: int = 8
-    RTI: int = 9
+    CONTINUE = 0
+    STOP = 1
+    LOOP = 2
+    END_LOOP = 3
+    JSR = 4
+    RTS = 5
+    BRANCH = 6
+    LONG_DELAY = 7
+    WAIT = 8
+    RTI = 9
 
 
 @register(manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", flags=re.IGNORECASE)

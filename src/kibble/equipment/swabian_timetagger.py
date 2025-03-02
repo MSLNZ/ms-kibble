@@ -86,9 +86,9 @@ class StatusCode(IntEnum):
         OVERFLOW: `2`
     """
 
-    SUCCESS: int = 0
-    TIMEOUT: int = 1
-    OVERFLOW: int = 2
+    SUCCESS = 0
+    TIMEOUT = 1
+    OVERFLOW = 2
 
 
 @dataclass(frozen=True, kw_only=True)
