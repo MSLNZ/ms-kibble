@@ -187,7 +187,7 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
 
     def __del__(self) -> None:
         """Called when object reference count reaches zero."""
-        self._cleanup()
+        self.disconnect()
 
     def __enter__(self) -> Self:
         """Enter a "with" statement."""
@@ -200,10 +200,10 @@ class TimeTag(TimeTagger.CustomMeasurement):  # type: ignore[misc]
         exc_tb: TracebackType | None,
     ) -> None:
         """Exit a "with" statement."""
-        self._cleanup()
+        self.disconnect()
 
-    def _cleanup(self) -> None:
-        """Stop the measurement and release the TimeTagger object from memory."""
+    def disconnect(self) -> None:
+        """Stop all running measurements and release the TimeTagger object from memory."""
         if not hasattr(self, "_free_tagger") or not hasattr(self, "this"):
             return
 
@@ -780,3 +780,11 @@ class TimeIntervalAnalyser:
         """
         self._measurement.start()
         sleep(delay)
+
+    def stop(self) -> None:
+        """Stop the measurement."""
+        self._measurement.stop()
+
+    def disconnect(self) -> None:
+        """Stop all running measurements and release the TimeTagger object from memory."""
+        self._measurement.disconnect()
