@@ -472,7 +472,7 @@ class TimeTagGated(TimeTag):
             return
 
         # Check for rising edge of GATE signal
-        start_time = None
+        start_time: int = -1
         if not self._is_gated:
             indices = tags["channel"] == self._gate_channel
             if not np.any(indices):
@@ -481,7 +481,7 @@ class TimeTagGated(TimeTag):
             start_time = tags[indices]["time"][0]
 
         # Check for falling edge of GATE signal
-        stop_time = None
+        stop_time: int = -1
         indices = tags["channel"] == -self._gate_channel
         if np.any(indices):
             self._is_gated = False
@@ -489,11 +489,12 @@ class TimeTagGated(TimeTag):
             stop_time = tags[indices]["time"][0]
 
         # Filter valid time tags
-        if start_time is not None and stop_time is not None:
-            self._insert_tags(tags[np.logical_and(tags["time"] >= start_time, tags["time"] <= stop_time)])
-        elif start_time is not None:
-            self._insert_tags(tags[tags["time"] >= start_time])
-        elif stop_time is not None:
+        if start_time != -1:
+            if stop_time != -1:
+                self._insert_tags(tags[np.logical_and(tags["time"] >= start_time, tags["time"] <= stop_time)])
+            else:
+                self._insert_tags(tags[tags["time"] >= start_time])
+        elif stop_time != -1:
             self._insert_tags(tags[tags["time"] <= stop_time])
         else:
             self._insert_tags(tags)
@@ -525,7 +526,8 @@ class TimeTagTriggered(TimeTag):
                 [TimeTag][kibble.equipment.swabian_timetagger.TimeTag] for more details.
             tagger: A Swabian `TimeTagger` instance. If not specified, a new instance is created.
         """
-        self._finished_time = 0  # timestamp, in picoseconds, when the measurement is done
+        self._is_triggered: bool = False  # whether the TRIGGER event was received
+        self._done_time: int = -1  # timestamp, in picoseconds, when the measurement is done
         self._trigger_channel: int = trigger.number
 
         channels = list(events)
@@ -541,7 +543,8 @@ class TimeTagTriggered(TimeTag):
 
     def on_start(self) -> None:
         """Do not call. Called automatically when `self.start()` is called."""
-        self._finished_time = -1
+        self._is_triggered = False
+        self._done_time = -1
 
     def process(self, tags: NDArray[Any], begin_time: int, end_time: int) -> None:  # noqa: ARG002
         """Callback function to process a data stream from the time tagger.
@@ -555,22 +558,30 @@ class TimeTagTriggered(TimeTag):
         if not self._tags_okay(tags):
             return
 
-        triggered_tags = None
-        if self._finished_time > 0:
-            if end_time < self._finished_time:
-                triggered_tags = tags
-            else:
-                self._is_done = True
-                triggered_tags = tags[tags["time"] <= self._finished_time]
-        else:
+        # Check for rising edge of TRIGGER signal
+        start_time: int = -1
+        if not self._is_triggered:
             trigger_indices = tags["channel"] == self._trigger_channel
-            if np.any(trigger_indices):
-                start_time = tags[trigger_indices]["time"][0]
-                triggered_tags = tags[tags["time"] >= start_time]
-                self._finished_time = start_time + round(self._duration * 1e12)
+            if not np.any(trigger_indices):
+                return
 
-        if triggered_tags is not None:
-            self._insert_tags(triggered_tags)
+            self._is_triggered = True
+            start_time = tags[trigger_indices]["time"][0]
+            self._done_time = start_time + round(self._duration * 1e12)
+
+        # Check if the specified duration has elapsed
+        self._is_done = end_time >= self._done_time
+
+        # Filter valid time tags
+        if start_time != -1:
+            if self._is_done:
+                self._insert_tags(tags[np.logical_and(tags["time"] >= start_time, tags["time"] <= self._done_time)])
+            else:
+                self._insert_tags(tags[tags["time"] >= start_time])
+        elif self._is_done:
+            self._insert_tags(tags[tags["time"] <= self._done_time])
+        else:
+            self._insert_tags(tags)
 
 
 class TimeIntervalAnalyser:
@@ -739,6 +750,13 @@ class TimeIntervalAnalyser:
         stop = self._stop.number
         channels = self._measurement.channels
         timestamps = self._measurement.timestamps
+
+        if channels.size == 0:
+            if self._gate is not None:
+                msg = "No events detected, try to increase the width of the gate pulse"
+            else:
+                msg = "No events detected, try to increase the duration time of the measurement"
+            raise RuntimeError(msg)
 
         if self._gate is not None:
             if channels[0] != self._gate.number:
