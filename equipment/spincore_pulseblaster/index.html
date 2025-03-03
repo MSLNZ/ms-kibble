@@ -1,0 +1,2400 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="MSL Kibble Balance software.">
+      
+      
+      
+      
+        <link rel="prev" href="../agilent_33500b/">
+      
+      
+        <link rel="next" href="../swabian_timetagger/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.6">
+    
+    
+      
+        <title>PulseBlaster - MSL Kibble</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#kibble.equipment.spincore_pulseblaster.Code" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MSL Kibble" class="md-header__button md-logo" aria-label="MSL Kibble" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MSL Kibble
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PulseBlaster
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/MSLNZ/ms-kibble" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MSL Kibble" class="md-nav__button md-logo" aria-label="MSL Kibble" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    MSL Kibble
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/MSLNZ/ms-kibble" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Equipment
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Equipment
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agilent_3458a/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agilent3458A
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agilent_33500b/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Agilent33500b
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    PulseBlaster
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    PulseBlaster
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.Code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster" class="md-nav__link">
+    <span class="md-ellipsis">
+      PulseBlaster
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PulseBlaster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.add_instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_instruction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.disconnect" class="md-nav__link">
+    <span class="md-ellipsis">
+      disconnect
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.one_pulse_two_channels" class="md-nav__link">
+    <span class="md-ellipsis">
+      one_pulse_two_channels
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming" class="md-nav__link">
+    <span class="md-ellipsis">
+      start_programming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.status" class="md-nav__link">
+    <span class="md-ellipsis">
+      status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.stop_programming" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop_programming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      trigger
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.Status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Status
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.Version" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../swabian_timetagger/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    TimeTagger
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            About
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/release-notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../about/license/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    License
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.Code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster" class="md-nav__link">
+    <span class="md-ellipsis">
+      PulseBlaster
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PulseBlaster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.add_instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_instruction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.disconnect" class="md-nav__link">
+    <span class="md-ellipsis">
+      disconnect
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.one_pulse_two_channels" class="md-nav__link">
+    <span class="md-ellipsis">
+      one_pulse_two_channels
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.reset" class="md-nav__link">
+    <span class="md-ellipsis">
+      reset
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start" class="md-nav__link">
+    <span class="md-ellipsis">
+      start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming" class="md-nav__link">
+    <span class="md-ellipsis">
+      start_programming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.status" class="md-nav__link">
+    <span class="md-ellipsis">
+      status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.stop" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.stop_programming" class="md-nav__link">
+    <span class="md-ellipsis">
+      stop_programming
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      trigger
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.version" class="md-nav__link">
+    <span class="md-ellipsis">
+      version
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.Status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Status
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kibble.equipment.spincore_pulseblaster.Version" class="md-nav__link">
+    <span class="md-ellipsis">
+      Version
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>PulseBlaster</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+
+    <div class="doc doc-contents first">
+
+        <p>SpinCore PulseBlaster.</p>
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="kibble.equipment.spincore_pulseblaster.Code" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Code</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.Code" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="enum.IntEnum" href="https://docs.python.org/3/library/enum.html#enum.IntEnum">IntEnum</a></code></p>
+
+
+        <p>Program instruction codes.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.CONTINUE">CONTINUE</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>0</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.STOP">STOP</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>1</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.LOOP">LOOP</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>2</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.END_LOOP">END_LOOP</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>= 3</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.JSR">JSR</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>4</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.RTS">RTS</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>5</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.BRANCH">BRANCH</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>6</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.LONG_DELAY">LONG_DELAY</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>7</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.WAIT">WAIT</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>8</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Code.RTI">RTI</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>9</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="kibble.equipment.spincore_pulseblaster.PulseBlaster" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">PulseBlaster</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster" class="headerlink" title="Permanent link">¤</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">PulseBlaster</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="msl.equipment.connection_sdk.ConnectionSDK" href="https://msl-equipment.readthedocs.io/en/latest/_api/msl.equipment.connection_sdk.html#msl.equipment.connection_sdk.ConnectionSDK">ConnectionSDK</a></code></p>
+
+
+        <p>SpinCore PulseBlaster.</p>
+
+        <p>See <a href="http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html">SpinAPI</a>
+for the API reference.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>record</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="msl.equipment.record_types.EquipmentRecord" href="https://msl-equipment.readthedocs.io/en/latest/_api/msl.equipment.record_types.html#msl.equipment.record_types.EquipmentRecord">EquipmentRecord</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The equipment record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+                  <details class="quote">
+                    <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">:</span> <span class="n">EquipmentRecord</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa: PLR0915</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Communicate with a SpinCore PulseBlaster.</span>
+
+<span class="sd">    See [SpinAPI](http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html)</span>
+<span class="sd">    for the API reference.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        record: The equipment record.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="n">record</span><span class="p">,</span> <span class="n">libtype</span><span class="o">=</span><span class="s2">&quot;cdll&quot;</span><span class="p">)</span>
+
+    <span class="c1"># initialize function declarations in spinapi64.dll</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_error</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_error</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_char_p</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_read_status</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_read_status</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_count_boards</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_count_boards</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_select_board</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_select_board</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_select_board</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_init</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_init</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_init</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_close</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_close</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_close</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_version</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_version</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_char_p</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_firmware_id</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_firmware_id</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_core_clock</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_double</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_core_clock</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start_programming</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start_programming</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start_programming</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop_programming</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop_programming</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop_programming</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_inst_pbonly</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[</span><span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_int</span><span class="p">,</span> <span class="n">c_double</span><span class="p">]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_inst_pbonly</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_inst_pbonly</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_reset</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_reset</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_reset</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop</span><span class="o">.</span><span class="n">argtype</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop</span><span class="o">.</span><span class="n">restype</span> <span class="o">=</span> <span class="n">c_int</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop</span><span class="o">.</span><span class="n">errcheck</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_errcheck</span>
+
+    <span class="c1"># configure the default PulseBlaster settings</span>
+    <span class="n">n_boards</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_count_boards</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">n_boards</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No PulseBlaster boards are available&quot;</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_boards</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_boards</span><span class="si">}</span><span class="s2"> PulseBlaster boards are available.&quot;</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_select_board</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_init</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_core_clock</span><span class="p">(</span><span class="n">c_double</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span>  <span class="c1"># 100 MHz clock frequency</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.add_instruction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">add_instruction</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.add_instruction" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_instruction</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">bits</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="n">Code</span><span class="o">.</span><span class="n">CONTINUE</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Add an instruction to the <code>PULSE_PROGRAM</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>bits</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" title="collections.abc.Sequence" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence">Sequence</a>[<a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A sequence of bits to set to be TTL high. Each value must
+be between 0 and 23, inclusive.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>code</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Code (kibble.equipment.spincore_pulseblaster.Code)" href="#kibble.equipment.spincore_pulseblaster.Code">Code</a> | <a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Operation code for the instruction.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="kibble.equipment.spincore_pulseblaster.Code.CONTINUE">CONTINUE</span></code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>duration</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of seconds to use for this instruction.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.001</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>data</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The corresponding data for the <code>code</code> parameter.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The address of the created instruction. This address can be</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>used as the branch address for any branch instructions.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">add_instruction</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">bits</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">code</span><span class="p">:</span> <span class="n">Code</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Code</span><span class="o">.</span><span class="n">CONTINUE</span><span class="p">,</span>
+    <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add an instruction to the ``PULSE_PROGRAM``.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        bits: A sequence of bits to set to be TTL high. Each value must</span>
+<span class="sd">            be between 0 and 23, inclusive.</span>
+<span class="sd">        code: Operation code for the instruction.</span>
+<span class="sd">        duration: Number of seconds to use for this instruction.</span>
+<span class="sd">        data: The corresponding data for the `code` parameter.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The address of the created instruction. This address can be</span>
+<span class="sd">        used as the branch address for any branch instructions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">bits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="n">bits</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bit</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">bit</span> <span class="o">&gt;</span> <span class="mi">23</span><span class="p">:</span>  <span class="c1"># noqa: PLR2004</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;A bit must be in the range 0..23, got </span><span class="si">{</span><span class="n">bit</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">flags</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">bit</span>
+
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_inst_pbonly</span><span class="p">(</span><span class="n">flags</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">c_double</span><span class="p">(</span><span class="n">duration</span> <span class="o">*</span> <span class="mf">1e9</span><span class="p">)))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.disconnect" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">disconnect</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.disconnect" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">disconnect</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Disconnect from the PulseBlaster board.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Disconnect from the PulseBlaster board.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_close</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_connected</span> <span class="o">=</span> <span class="kc">False</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.one_pulse_two_channels" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">one_pulse_two_channels</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.one_pulse_two_channels" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">one_pulse_two_channels</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">first</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">second</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">width</span><span class="o">=</span><span class="mf">0.001</span><span class="p">,</span>
+    <span class="n">delay</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">single</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">period</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Configure a new <code>PULSE_PROGRAM</code> that creates one pulse on two channels.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>first</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>bit#</code> to use for the first pulse.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>second</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The <code>bit#</code> to use for the second pulse.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>width</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The width, in seconds, of each pulse.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.001</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>delay</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The delay, in seconds, of the second pulse.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>single</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#bool">bool</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Whether the pulses are output in single-shot mode. If enabled,
+the <a class="autorefs autorefs-internal" href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger">trigger</a>
+method must be called before the pulses are output.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>period</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#float">float</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The time, in seconds, between the rising edge of the
+first pulses. Only used if <code>single</code> is <code>False</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span>
+<span class="normal">225</span>
+<span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">one_pulse_two_channels</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">first</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">second</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+    <span class="n">delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">single</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure a new ``PULSE_PROGRAM`` that creates one pulse on two channels.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        first: The `bit#` to use for the first pulse.</span>
+<span class="sd">        second: The `bit#` to use for the second pulse.</span>
+<span class="sd">        width: The width, in seconds, of each pulse.</span>
+<span class="sd">        delay: The delay, in seconds, of the second pulse.</span>
+<span class="sd">        single: Whether the pulses are output in single-shot mode. If enabled,</span>
+<span class="sd">            the [trigger][kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger]</span>
+<span class="sd">            method must be called before the pulses are output.</span>
+<span class="sd">        period: The time, in seconds, between the rising edge of the</span>
+<span class="sd">            first pulses. Only used if `single` is `False`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">delay</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Only positive delays are allowed, got </span><span class="si">{</span><span class="n">delay</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">start_programming</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">delay</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="p">[</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">delay</span> <span class="o">&lt;</span> <span class="n">width</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">width</span> <span class="o">-</span> <span class="n">delay</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_DURATION</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">delay</span> <span class="o">+</span> <span class="n">d</span> <span class="o">+</span> <span class="n">delay</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="p">[</span><span class="n">first</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="p">[</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="p">[</span><span class="n">second</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">delay</span> <span class="o">-</span> <span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_DURATION</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">width</span> <span class="o">+</span> <span class="n">d</span> <span class="o">+</span> <span class="n">width</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="p">[</span><span class="n">first</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">bits</span><span class="o">=</span><span class="p">[</span><span class="n">second</span><span class="p">],</span> <span class="n">duration</span><span class="o">=</span><span class="n">width</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_DURATION</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">Code</span><span class="o">.</span><span class="n">STOP</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MIN_DURATION</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">period</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">period</span> <span class="o">&lt;</span> <span class="n">total</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;period (</span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s2">) &lt; total time for pulses (</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">period</span> <span class="o">-</span> <span class="n">total</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_DURATION</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">period</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MIN_DURATION</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">Code</span><span class="o">.</span><span class="n">BRANCH</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">stop_programming</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.reset" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">reset</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.reset" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">reset</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stops the output of board and resets the PulseBlaster.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops the output of board and resets the PulseBlaster.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_reset</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.start" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">start</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">start</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Send a software trigger to the board to start the pulse program.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a software trigger to the board to start the pulse program.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">start_programming</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">start_programming</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Start a <code>PULSE_PROGRAM</code>.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">start_programming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Start a ``PULSE_PROGRAM``.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start_programming</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># PULSE_PROGRAM = 0</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.status" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">status</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.status" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">status</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Read status from the board.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">288</span>
+<span class="normal">289</span>
+<span class="normal">290</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read status from the board.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Status</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_read_status</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.stop" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">stop</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.stop" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">stop</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stops output of board.</p>
+<p>Analog output will return to ground, and TTL outputs will either remain in the same
+state they were in when the reset command was received or return to ground.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops output of board.</span>
+
+<span class="sd">    Analog output will return to ground, and TTL outputs will either remain in the same</span>
+<span class="sd">    state they were in when the reset command was received or return to ground.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.stop_programming" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">stop_programming</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.stop_programming" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">stop_programming</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Stop programming the <code>PULSE_PROGRAM</code>, which was started by <code>start_programming()</code>.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop_programming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stop programming the ``PULSE_PROGRAM``, which was started by `start_programming()`.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop_programming</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">trigger</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.trigger" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">trigger</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Restart the <code>PULSE_PROGRAM</code>.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">304</span>
+<span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Restart the ``PULSE_PROGRAM``.&quot;&quot;&quot;</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="kibble.equipment.spincore_pulseblaster.PulseBlaster.version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">version</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.version" class="headerlink" title="Permanent link">¤</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">version</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the version information.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="Version (kibble.equipment.spincore_pulseblaster.Version)" href="#kibble.equipment.spincore_pulseblaster.Version">Version</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Version information.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">309</span>
+<span class="normal">310</span>
+<span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span>
+<span class="normal">315</span>
+<span class="normal">316</span>
+<span class="normal">317</span>
+<span class="normal">318</span>
+<span class="normal">319</span>
+<span class="normal">320</span>
+<span class="normal">321</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Version</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the version information.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Version information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fw</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_firmware_id</span><span class="p">()</span>
+
+    <span class="c1"># See: C:\SpinCore\SpinAPI\examples\General\pb_read_firmware.c</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="p">(</span><span class="n">fw</span> <span class="o">&amp;</span> <span class="mh">0xFF00</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+    <span class="n">revision</span> <span class="o">=</span> <span class="n">fw</span> <span class="o">&amp;</span> <span class="mh">0x00FF</span>
+
+    <span class="k">return</span> <span class="n">Version</span><span class="p">(</span><span class="n">software</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_get_version</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span> <span class="n">firmware</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">revision</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="kibble.equipment.spincore_pulseblaster.Status" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Status</span>
+
+
+<a href="#kibble.equipment.spincore_pulseblaster.Status" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-external" title="enum.IntEnum" href="https://docs.python.org/3/library/enum.html#enum.IntEnum">IntEnum</a></code></p>
+
+
+        <p>Board status.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Status.STOPPED">STOPPED</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>1</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Status.RESET">RESET</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>2</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Status.RUNNING">RUNNING</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>4</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Status.WAITING">WAITING</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>8</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Status.SCANNING">SCANNING</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>16</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="kibble.equipment.spincore_pulseblaster.Version" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Version</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#kibble.equipment.spincore_pulseblaster.Version" class="headerlink" title="Permanent link">¤</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">Version</span><span class="p">(</span><span class="n">software</span><span class="p">,</span> <span class="n">firmware</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+
+        <p>Board software and firmware version numbers.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Version.software">software</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Software version number.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="kibble.equipment.spincore_pulseblaster.Version.firmware">firmware</span></code></td>
+            <td>
+                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/stdtypes.html#str">str</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Firmware version number.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../agilent_33500b/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Agilent33500b">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Agilent33500b
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../swabian_timetagger/" class="md-footer__link md-footer__link--next" aria-label="Next: TimeTagger">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                TimeTagger
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 Measurement Standards Laboratory of New Zealand
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/MSLNZ/ms-kibble" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.indexes", "navigation.sections", "navigation.top", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
