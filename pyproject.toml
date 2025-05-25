@@ -6,7 +6,9 @@ build-backend = "hatchling.build"
 name = "kibble"
 dynamic = ["version"]
 dependencies = [
+  "matplotlib>=3.10.3",
   "msl-equipment @ git+https://github.com/MSLNZ/msl-equipment.git",
+  "scipy>=1.15.3",
 ]
 requires-python = ">= 3.12"
 description = "MSL Kibble Balance software."
@@ -28,6 +30,7 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering",
   "Topic :: Software Development",
 ]
@@ -35,20 +38,32 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/MSLNZ/ms-kibble"
 Source = "https://github.com/MSLNZ/ms-kibble"
+Tracker = "https://github.com/MSLNZ/ms-kibble/issues"
 
-[project.optional-dependencies]
-tests = [
-  "pytest",
+[dependency-groups]
+doc = [
+    "black>=25.1.0",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.14",
+    "mkdocstrings-python>=1.16.11",
 ]
-docs = [
-  "black",
-  "mkdocs",
-  "mkdocs-material",
-  "mkdocstrings-python",
+lint = [
+    "ruff>=0.11.11",
+]
+test = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+]
+type = [
+    "basedpyright>=1.29.2",
+    "mypy>=1.15.0",
 ]
 dev = [
-  "kibble[docs,tests]",
-  "mypy",
+    {include-group = "doc"},
+    {include-group = "lint"},
+    {include-group = "test"},
+    {include-group = "type"},
+    "kibble",
 ]
 
 [tool.hatch.metadata]
@@ -60,23 +75,78 @@ source = "vcs"
 [tool.hatch.build.hooks.vcs]
 version-file = "src/kibble/_version.py"
 
+[tool.pytest.ini_options]
+cache_dir = ".cache/pytest"
+addopts = [
+    "--cov=src",
+    "--cov-report=html",
+    "--cov-config=pyproject.toml",
+    "--verbose",
+    "--doctest-modules",
+    "--doctest-glob=*.md",
+    "--import-mode=importlib",
+    "--ignore=examples/",
+]
+doctest_optionflags = "NORMALIZE_WHITESPACE ALLOW_UNICODE ELLIPSIS"
+
+[tool.coverage.run]
+data_file = ".cache/coverage/.coverage"
+branch = true
+omit = [
+    "examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "pragma: no branch",
+  "if TYPE_CHECKING:",
+  "if __name__ == .__main__.:",
+]
+
+[tool.coverage.html]
+directory = ".cache/coverage"
+title = "Kibble coverage report"
+
 [tool.mypy]
+cache_dir = ".cache/mypy"
 strict = true
-implicit_reexport = true
+strict_bytes = true
+allow_redefinition = false
+allow_untyped_globals = false
+disallow_any_decorated = true
+disallow_any_explicit = true
+disallow_any_expr = true
+disallow_any_unimported = true
+ignore_missing_imports = false
+implicit_optional = false
+local_partial_types = true
+scripts_are_modules = true
+warn_no_return = true
+warn_unreachable = true
+
+[tool.basedpyright]
+failOnWarnings = true
+typeCheckingMode = "recommended"
+useLibraryCodeForTypes = false
+exclude = [
+    "**/.*",
+    "**/__pycache__",
+    "src/kibble/_version.py",
+]
 
 [tool.ruff]
 line-length = 120
 exclude = [
-  ".git",
-  ".mypy_cache",
-  ".pytest_cache",
-  ".ruff_cache",
-  ".venv",
-  "build",
-  "dist",
-  "venv",
+    ".cache",
+    ".git",
+    ".github",
+    ".venv",
+    "dist",
+    "site",
+    "venv",
+    "src/kibble/_version.py",
 ]
-extend-include = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -91,12 +161,6 @@ ignore = [
 known-first-party = ["kibble"]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = [
-  "F401", # Imported but unused
-]
-"__about__.py" = [
-  "F401", # Imported but unused
-]
 "examples/*.py" = [
   "INP001",  # implicit-namespace-package
   "T201",  # print statements
