@@ -995,7 +995,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>= 3</p>
+                <p>3</p>
               </div>
             </td>
           </tr>
@@ -1366,8 +1366,8 @@ for the API reference.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A sequence of bits to set to be TTL high. Each value must
-be between 0 and 23, inclusive.</p>
+                <p>A sequence of <em>bit#</em> values to set to be TTL high.
+Each value must be between 0 and 23, inclusive.</p>
               </div>
             </td>
             <td>
@@ -1441,17 +1441,8 @@ be between 0 and 23, inclusive.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The address of the created instruction. This address can be</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-                  <code><a class="autorefs autorefs-external" href="https://docs.python.org/3/library/functions.html#int">int</a></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>used as the branch address for any branch instructions.</p>
+                <p>The address of the created instruction. This address can be
+used as the BRANCH address for a BRANCH instruction.</p>
               </div>
             </td>
           </tr>
@@ -1498,18 +1489,18 @@ be between 0 and 23, inclusive.</p>
     <span class="n">duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add an instruction to the ``PULSE_PROGRAM``.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add an instruction to the `PULSE_PROGRAM`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        bits: A sequence of bits to set to be TTL high. Each value must</span>
-<span class="sd">            be between 0 and 23, inclusive.</span>
+<span class="sd">        bits: A sequence of *bit#* values to set to be TTL high.</span>
+<span class="sd">            Each value must be between 0 and 23, inclusive.</span>
 <span class="sd">        code: Operation code for the instruction.</span>
 <span class="sd">        duration: Number of seconds to use for this instruction.</span>
 <span class="sd">        data: The corresponding data for the `code` parameter.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The address of the created instruction. This address can be</span>
-<span class="sd">        used as the branch address for any branch instructions.</span>
+<span class="sd">            used as the BRANCH address for a BRANCH instruction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">flags</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">bits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1607,7 +1598,7 @@ be between 0 and 23, inclusive.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>bit#</code> to use for the first pulse.</p>
+                <p>The <em>bit#</em> to use for the first pulse.</p>
               </div>
             </td>
             <td>
@@ -1623,7 +1614,7 @@ be between 0 and 23, inclusive.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The <code>bit#</code> to use for the second pulse.</p>
+                <p>The <em>bit#</em> to use for the second pulse.</p>
               </div>
             </td>
             <td>
@@ -1771,11 +1762,11 @@ first pulses. Only used if <code>single</code> is <code>False</code>.</p>
     <span class="n">single</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure a new ``PULSE_PROGRAM`` that creates one pulse on two channels.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configure a new `PULSE_PROGRAM` that creates one pulse on two channels.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        first: The `bit#` to use for the first pulse.</span>
-<span class="sd">        second: The `bit#` to use for the second pulse.</span>
+<span class="sd">        first: The *bit#* to use for the first pulse.</span>
+<span class="sd">        second: The *bit#* to use for the second pulse.</span>
 <span class="sd">        width: The width, in seconds, of each pulse.</span>
 <span class="sd">        delay: The delay, in seconds, of the second pulse.</span>
 <span class="sd">        single: Whether the pulses are output in single-shot mode. If enabled,</span>
@@ -1839,15 +1830,25 @@ first pulses. Only used if <code>single</code> is <code>False</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Stops the output of board and resets the PulseBlaster.</p>
+        <p>Stops the board output and resets the PulseBlaster.</p>
+<p>Analogue output will return to ground and TTL outputs will either remain in the same
+state they were in when the reset command was received or will return to ground.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">277</span>
 <span class="normal">278</span>
-<span class="normal">279</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops the output of board and resets the PulseBlaster.&quot;&quot;&quot;</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops the board output and resets the PulseBlaster.</span>
+
+<span class="sd">    Analogue output will return to ground and TTL outputs will either remain in the same</span>
+<span class="sd">    state they were in when the reset command was received or will return to ground.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_reset</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1868,15 +1869,15 @@ first pulses. Only used if <code>single</code> is <code>False</code>.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Send a software trigger to the board to start the pulse program.</p>
+        <p>Send a software trigger to the board to start the <code>PULSE_PROGRAM</code>.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">281</span>
-<span class="normal">282</span>
-<span class="normal">283</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a software trigger to the board to start the pulse program.&quot;&quot;&quot;</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Send a software trigger to the board to start the `PULSE_PROGRAM`.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1902,10 +1903,10 @@ first pulses. Only used if <code>single</code> is <code>False</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">285</span>
-<span class="normal">286</span>
-<span class="normal">287</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">start_programming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Start a ``PULSE_PROGRAM``.&quot;&quot;&quot;</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">289</span>
+<span class="normal">290</span>
+<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">start_programming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Start a `PULSE_PROGRAM`.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_start_programming</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># PULSE_PROGRAM = 0</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -1931,9 +1932,9 @@ first pulses. Only used if <code>single</code> is <code>False</code>.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">289</span>
-<span class="normal">290</span>
-<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Status</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read status from the board.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Status</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_read_status</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
@@ -1956,23 +1957,23 @@ first pulses. Only used if <code>single</code> is <code>False</code>.</p>
     <div class="doc doc-contents ">
 
         <p>Stops output of board.</p>
-<p>Analogue output will return to ground, and TTL outputs will either remain in the same
-state they were in when the reset command was received or return to ground.</p>
+<p>Analogue output will return to ground and TTL outputs will either remain in the same
+state they were in when the stop command was received or will return to ground.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">293</span>
-<span class="normal">294</span>
-<span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">297</span>
 <span class="normal">298</span>
-<span class="normal">299</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Stops output of board.</span>
 
-<span class="sd">    Analogue output will return to ground, and TTL outputs will either remain in the same</span>
-<span class="sd">    state they were in when the reset command was received or return to ground.</span>
+<span class="sd">    Analogue output will return to ground and TTL outputs will either remain in the same</span>
+<span class="sd">    state they were in when the stop command was received or will return to ground.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -1994,15 +1995,20 @@ state they were in when the reset command was received or return to ground.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Stop programming the <code>PULSE_PROGRAM</code>, which was started by <code>start_programming()</code>.</p>
+        <p>Stop programming the <code>PULSE_PROGRAM</code>, which was started by
+<a class="autorefs autorefs-internal" title="start_programming" href="#kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming">start_programming</a>.</p>
 
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">301</span>
-<span class="normal">302</span>
-<span class="normal">303</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop_programming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stop programming the ``PULSE_PROGRAM``, which was started by `start_programming()`.&quot;&quot;&quot;</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">305</span>
+<span class="normal">306</span>
+<span class="normal">307</span>
+<span class="normal">308</span>
+<span class="normal">309</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stop_programming</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Stop programming the `PULSE_PROGRAM`, which was started by</span>
+<span class="sd">    [start_programming][kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming].</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: D205</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">sdk</span><span class="o">.</span><span class="n">pb_stop_programming</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -2028,11 +2034,11 @@ state they were in when the reset command was received or return to ground.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">305</span>
-<span class="normal">306</span>
-<span class="normal">307</span>
-<span class="normal">308</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Restart the ``PULSE_PROGRAM``.&quot;&quot;&quot;</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">311</span>
+<span class="normal">312</span>
+<span class="normal">313</span>
+<span class="normal">314</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">trigger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Restart the `PULSE_PROGRAM`.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </code></pre></div></td></tr></table></div>
@@ -2087,19 +2093,19 @@ state they were in when the reset command was received or return to ground.</p>
 
             <details class="quote">
               <summary>Source code in <code>src/kibble/equipment/spincore_pulseblaster.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">310</span>
-<span class="normal">311</span>
-<span class="normal">312</span>
-<span class="normal">313</span>
-<span class="normal">314</span>
-<span class="normal">315</span>
-<span class="normal">316</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">316</span>
 <span class="normal">317</span>
 <span class="normal">318</span>
 <span class="normal">319</span>
 <span class="normal">320</span>
 <span class="normal">321</span>
-<span class="normal">322</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Version</span><span class="p">:</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Version</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the version information.</span>
 
 <span class="sd">    Returns:</span>
