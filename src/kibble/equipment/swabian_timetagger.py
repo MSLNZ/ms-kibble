@@ -1,4 +1,4 @@
-"""Swabian TimeTagger equipment."""
+"""Swabian TimeTagger."""
 
 # pyright: reportMissingTypeStubs=false, reportAssignmentType=false, reportAttributeAccessIssue=false, reportUnknownMemberType=false, reportOptionalMemberAccess=false, reportUninitializedInstanceVariable=false
 # cSpell: words redef Deadtime

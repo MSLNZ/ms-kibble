@@ -56,7 +56,7 @@ class Code(IntEnum):
         CONTINUE: 0
         STOP: 1
         LOOP: 2
-        END_LOOP: = 3
+        END_LOOP: 3
         JSR: 4
         RTS: 5
         BRANCH: 6
@@ -183,18 +183,18 @@ class PulseBlaster(SDK, manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", f
         duration: float = 1e-3,
         data: int = 0,
     ) -> int:
-        """Add an instruction to the ``PULSE_PROGRAM``.
+        """Add an instruction to the `PULSE_PROGRAM`.
 
         Args:
-            bits: A sequence of bits to set to be TTL high. Each value must
-                be between 0 and 23, inclusive.
+            bits: A sequence of *bit#* values to set to be TTL high.
+                Each value must be between 0 and 23, inclusive.
             code: Operation code for the instruction.
             duration: Number of seconds to use for this instruction.
             data: The corresponding data for the `code` parameter.
 
         Returns:
             The address of the created instruction. This address can be
-            used as the branch address for any branch instructions.
+                used as the BRANCH address for a BRANCH instruction.
         """
         flags = 0
         if bits is not None:
@@ -216,11 +216,11 @@ class PulseBlaster(SDK, manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", f
         single: bool = True,
         period: float | None = None,
     ) -> None:
-        """Configure a new ``PULSE_PROGRAM`` that creates one pulse on two channels.
+        """Configure a new `PULSE_PROGRAM` that creates one pulse on two channels.
 
         Args:
-            first: The `bit#` to use for the first pulse.
-            second: The `bit#` to use for the second pulse.
+            first: The *bit#* to use for the first pulse.
+            second: The *bit#* to use for the second pulse.
             width: The width, in seconds, of each pulse.
             delay: The delay, in seconds, of the second pulse.
             single: Whether the pulses are output in single-shot mode. If enabled,
@@ -275,15 +275,19 @@ class PulseBlaster(SDK, manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", f
         self._connected = False
 
     def reset(self) -> None:
-        """Stops the output of board and resets the PulseBlaster."""
+        """Stops the board output and resets the PulseBlaster.
+
+        Analogue output will return to ground and TTL outputs will either remain in the same
+        state they were in when the reset command was received or will return to ground.
+        """
         self.sdk.pb_reset()
 
     def start(self) -> None:
-        """Send a software trigger to the board to start the pulse program."""
+        """Send a software trigger to the board to start the `PULSE_PROGRAM`."""
         self.sdk.pb_start()
 
     def start_programming(self) -> None:
-        """Start a ``PULSE_PROGRAM``."""
+        """Start a `PULSE_PROGRAM`."""
         self.sdk.pb_start_programming(0)  # PULSE_PROGRAM = 0
 
     def status(self) -> Status:
@@ -293,17 +297,19 @@ class PulseBlaster(SDK, manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", f
     def stop(self) -> None:
         """Stops output of board.
 
-        Analogue output will return to ground, and TTL outputs will either remain in the same
-        state they were in when the reset command was received or return to ground.
+        Analogue output will return to ground and TTL outputs will either remain in the same
+        state they were in when the stop command was received or will return to ground.
         """
         self.sdk.pb_stop()
 
     def stop_programming(self) -> None:
-        """Stop programming the ``PULSE_PROGRAM``, which was started by `start_programming()`."""
+        """Stop programming the `PULSE_PROGRAM`, which was started by
+        [start_programming][kibble.equipment.spincore_pulseblaster.PulseBlaster.start_programming].
+        """  # noqa: D205
         self.sdk.pb_stop_programming()
 
     def trigger(self) -> None:
-        """Restart the ``PULSE_PROGRAM``."""
+        """Restart the `PULSE_PROGRAM`."""
         self.reset()
         self.start()
 
