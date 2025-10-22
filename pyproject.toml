@@ -111,13 +111,14 @@ title = "Kibble coverage report"
 
 [tool.mypy]
 cache_dir = ".cache/mypy"
+platform = "win32"
 strict = true
 strict_bytes = true
 allow_redefinition = false
 allow_untyped_globals = false
 disallow_any_decorated = true
-disallow_any_explicit = true
-disallow_any_expr = true
+disallow_any_explicit = false  # true
+disallow_any_expr = false  # true
 disallow_any_unimported = true
 ignore_missing_imports = false
 implicit_optional = false
@@ -130,13 +131,17 @@ warn_unreachable = true
 failOnWarnings = true
 typeCheckingMode = "recommended"
 useLibraryCodeForTypes = false
+pythonPlatform = "Windows"
 exclude = [
     "**/.*",
     "**/__pycache__",
-    "src/kibble/_version.py",
+    "**/_version.py",
 ]
+reportAny = false
+reportExplicitAny = false
 
 [tool.ruff]
+cache-dir = ".cache/ruff"
 line-length = 120
 exclude = [
     ".cache",

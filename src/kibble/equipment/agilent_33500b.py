@@ -1,27 +1,30 @@
 """Agilent 33500B Waveform Generator."""
 
+# cSpell: words VRMS
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from msl.equipment import MSLConnectionError
+
 if TYPE_CHECKING:
     from typing import Literal
 
-    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment import Equipment, MessageBased
 
 
 class Agilent33500B:
     """Agilent 33500B Waveform Generator."""
 
-    def __init__(self, record: EquipmentRecord, *, reset: bool = True, clear: bool = True) -> None:
+    def __init__(self, equipment: Equipment, *, reset: bool = True, clear: bool = True) -> None:
         """Communicate with an Agilent 33500B Waveform Generator.
 
         Args:
-            record: The equipment record.
+            equipment: An equipment instance.
             reset: Whether to automatically send the `*RST` command.
             clear: Whether to automatically send the `*CLS` command.
         """
-        self._cxn = record.connect()
+        self._cxn: MessageBased = equipment.connect()
 
         if reset:
             self.reset()
@@ -32,7 +35,7 @@ class Agilent33500B:
         """Check the waveform generator for an internal error."""
         reply: str = self._cxn.query("SYSTEM:ERROR?")
         if not reply.startswith("+0,"):
-            self._cxn.raise_exception(reply)
+            raise MSLConnectionError(self._cxn, reply)
 
     def sine(
         self,
@@ -74,7 +77,7 @@ class Agilent33500B:
             msg = f"The terminal load must be between 1 and 10 kOhm or None, got {load}"
             raise ValueError(msg)
 
-        self._cxn.write(
+        message = (
             f":OUTPUT{channel}:LOAD {load or 'INFINITY'};"  # OUTPUT must come before SOURCE
             f":SOURCE{channel}:FUNCTION SINUSOID;"
             f":SOURCE{channel}:FREQUENCY {frequency};"
@@ -83,11 +86,12 @@ class Agilent33500B:
             f":SOURCE{channel}:VOLT:OFFSET {offset};"
             f":SOURCE{channel}:PHASE {phase};"
         )
+        _ = self._cxn.write(message)
         self._check_error()
 
     def clear(self) -> None:
         """Clears the event registers in all register groups and the error queue."""
-        self._cxn.write("*CLS")
+        _ = self._cxn.write("*CLS")
 
     def disconnect(self) -> None:
         """Disconnect from the waveform generator."""
@@ -104,8 +108,8 @@ class Agilent33500B:
             msg = f"Channel must be either 1 or 2, got {channel}"
             raise ValueError(msg)
         s = "ON" if state else "OFF"
-        self._cxn.write(f"OUTPUT{channel} {s}")
+        _ = self._cxn.write(f"OUTPUT{channel} {s}")
 
     def reset(self) -> None:
         """Resets the waveform generator to the factory default state."""
-        self._cxn.write("*RST")
+        _ = self._cxn.write("*RST")

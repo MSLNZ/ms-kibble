@@ -1,9 +1,12 @@
 """Agilent33500B example."""
 
-from equipment_register import records  # type: ignore[import-not-found]
+from msl.equipment import Connection, Equipment
+
 from kibble import Agilent33500B
 
-awg = Agilent33500B(records["awg"])
+equipment = Equipment(connection=Connection("GPIB::10"))
+
+awg = Agilent33500B(equipment)
 
 # turn Channel 1 output off
 awg.output(channel=1, state=False)

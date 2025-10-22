@@ -1,21 +1,21 @@
 """SpinCore PulseBlaster."""
 
+# cSpell: words pbonly
 from __future__ import annotations
 
 import re
 from ctypes import c_char_p, c_double, c_int
 from dataclasses import dataclass
 from enum import IntEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, final, override
 
-from msl.equipment.connection_sdk import ConnectionSDK  # type: ignore[import-untyped]
-from msl.equipment.resources import register  # type: ignore[import-untyped]
+from msl.equipment import SDK
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
     from typing import Any
 
-    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment import Equipment
 
 
 @dataclass
@@ -77,8 +77,8 @@ class Code(IntEnum):
     RTI = 9
 
 
-@register(manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", flags=re.IGNORECASE)
-class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
+@final
+class PulseBlaster(SDK, manufacturer=r"Spin\s*Core", model=r"Pulse\s*Blaster", flags=re.IGNORECASE):
     """SpinCore PulseBlaster."""
 
     CODE = Code
@@ -86,17 +86,17 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
 
     MIN_DURATION = 50e-9  # 50ns is the minimum duration for a pulse-program instruction
 
-    def __init__(self, record: EquipmentRecord) -> None:  # noqa: PLR0915
+    def __init__(self, equipment: Equipment) -> None:  # noqa: PLR0915
         """Communicate with a SpinCore PulseBlaster.
 
         See [SpinAPI](http://www.spincore.com/support/spinapi/reference/production/2013-09-25/spinapi_8c.html)
         for the API reference.
 
         Args:
-            record: The equipment record.
+            equipment: An equipment instance.
         """
-        self._connected = False
-        super().__init__(record=record, libtype="cdll")
+        self._connected: bool = False
+        super().__init__(equipment, libtype="cdll")
 
         # initialize function declarations in spinapi64.dll
         self.sdk.pb_get_error.argtype = []
@@ -242,18 +242,18 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
             d = max(width - delay, self.MIN_DURATION)
             total = delay + d + delay
             start = self.add_instruction(bits=[first], duration=delay)
-            self.add_instruction(bits=[first, second], duration=d)
-            self.add_instruction(bits=[second], duration=delay)
+            _ = self.add_instruction(bits=[first, second], duration=d)
+            _ = self.add_instruction(bits=[second], duration=delay)
         else:
             d = max(delay - width, self.MIN_DURATION)
             total = width + d + width
             start = self.add_instruction(bits=[first], duration=width)
-            self.add_instruction(duration=d)
-            self.add_instruction(bits=[second], duration=width)
+            _ = self.add_instruction(duration=d)
+            _ = self.add_instruction(bits=[second], duration=width)
 
-        self.add_instruction(duration=self.MIN_DURATION)
+        _ = self.add_instruction(duration=self.MIN_DURATION)
         if single:
-            self.add_instruction(code=Code.STOP, duration=self.MIN_DURATION)
+            _ = self.add_instruction(code=Code.STOP, duration=self.MIN_DURATION)
         else:
             if period:
                 if period < total:
@@ -262,10 +262,11 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
                 period = max(period - total, self.MIN_DURATION)
             else:
                 period = self.MIN_DURATION
-            self.add_instruction(code=Code.BRANCH, data=start, duration=period)
+            _ = self.add_instruction(code=Code.BRANCH, data=start, duration=period)
 
         self.stop_programming()
 
+    @override
     def disconnect(self) -> None:
         """Disconnect from the PulseBlaster board."""
         if not self._connected:
@@ -292,7 +293,7 @@ class PulseBlaster(ConnectionSDK):  # type: ignore[misc]
     def stop(self) -> None:
         """Stops output of board.
 
-        Analog output will return to ground, and TTL outputs will either remain in the same
+        Analogue output will return to ground, and TTL outputs will either remain in the same
         state they were in when the reset command was received or return to ground.
         """
         self.sdk.pb_stop()

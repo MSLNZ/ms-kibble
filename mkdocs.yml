@@ -59,10 +59,10 @@ plugins:
       handlers:
         python:
           paths: [src]
-          import:
+          inventories:
             - url: https://docs.python.org/3/objects.inv
               domains: [std, py]
-            - https://msl-equipment.readthedocs.io/en/latest/objects.inv
+            - https://mslnz.github.io/msl-equipment/dev/objects.inv
             - https://numpy.org/doc/stable/objects.inv
           options:
             # General

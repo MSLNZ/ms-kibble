@@ -1,5 +1,6 @@
 """Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter."""
 
+# cSpell: words INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM fixedz
 from __future__ import annotations
 
 import warnings
@@ -7,31 +8,33 @@ from time import sleep
 from typing import TYPE_CHECKING
 
 import numpy as np
+from msl.equipment import MSLConnectionError
 
 if TYPE_CHECKING:
     from typing import Literal
 
     import numpy.typing as npt
-    from msl.equipment.record_types import EquipmentRecord  # type: ignore[import-untyped]
+    from msl.equipment import GPIB, Equipment
 
 
 class Agilent3458A:
     """Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter."""
 
-    def __init__(self, record: EquipmentRecord, *, reset: bool = True, clear: bool = True) -> None:
+    def __init__(self, equipment: Equipment, *, reset: bool = True, clear: bool = True) -> None:
         """Communicate with an Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter.
 
         Args:
-            record: The equipment record.
+            equipment: An equipment instance.
             reset: Whether to automatically send the RESET command.
             clear: Whether to automatically send the GPIB CLEAR command.
         """
         self._initiate_cmd: str = "<gets updated in configure>"
         self._check_revision: bool = True
-        self._nreadings: int = -1
+        self._num_readings: int = -1
 
-        record.connection.properties.setdefault("termination", "\r")
-        self._cxn = record.connect()
+        self._cxn: GPIB = equipment.connect()
+        self._cxn.read_termination = "\r"
+        self._cxn.write_termination = "\r"
 
         if reset:
             self.reset()
@@ -44,32 +47,27 @@ class Agilent3458A:
 
     def clear(self) -> None:
         """Clears the event registers in all register groups and the error queue."""
-        self._cxn.clear()
+        _ = self._cxn.clear()
 
-    def configure(  # noqa: C901
+    def configure(
         self,
         *,
-        function: Literal["DCV"] = "DCV",
         range: float = 10,  # noqa: A002
         nsamples: int = 10,
-        aperature: float = 0.01,
+        aperture: float = 0.01,
         auto_zero: Literal["ONCE", "ON", "OFF"] = "ONCE",
         trigger: Literal["IMMEDIATE", "BUS", "EXTERNAL"] = "IMMEDIATE",
-        edge: Literal["FALLING"] = "FALLING",
         ntriggers: int = 1,
         delay: float | None = None,
     ) -> float:
         """Configure the digital multimeter.
 
         Args:
-            function: The measurement function. Currently, only DCV is allowed.
             range: The range to use for the measurement.
             nsamples: The number of samples to acquire after a trigger event.
-            aperature: The A/D converter integration time in seconds.
+            aperture: The A/D converter integration time in seconds.
             auto_zero: The auto-zero mode. Either ONCE, ON or OFF.
             trigger: The trigger mode. Either IMMEDIATE, BUS or EXTERNAL.
-            edge: The trigger edge (only used if `trigger` is EXTERNAL).
-                Must always be FALLING.
             ntriggers: The number of triggers that are accepted before
                 returning to the wait-for-trigger state.
             delay: The number of seconds to wait after a trigger event before
@@ -78,14 +76,6 @@ class Agilent3458A:
         Returns:
             The actual A/D converter integration time in seconds.
         """
-        if function != "DCV":
-            msg = f"Only DCV is implemented, not {function!r}"
-            raise ValueError(msg)
-
-        if edge != "FALLING":
-            msg = f"Can only trigger on FALLING edge, got {edge!r}"
-            raise ValueError(msg)
-
         if auto_zero not in ["ONCE", "ON", "OFF"]:
             msg = f"Auto zero must be ONCE, ON or OFF. Got {auto_zero!r}"
             raise ValueError(msg)
@@ -109,12 +99,12 @@ class Agilent3458A:
                 self._check_revision = False
                 rev = tuple(map(int, self._cxn.query("REV?").split(",")))
                 if rev < (9, 2):
-                    warnings.warn(
+                    msg = (
                         f"Trigger {trigger} works with firmware revision "
                         f"(9, 2), but revision (6, 2) does not work. "
-                        f"The revision is {rev}.",
-                        stacklevel=2,
+                        f"The revision is {rev}."
                     )
+                    warnings.warn(msg, stacklevel=2)
 
         # Turning the INBUF ON/OFF is required because the GPIB write()
         # method waits for the count() return value. Therefore, when
@@ -126,39 +116,38 @@ class Agilent3458A:
         buff = "INBUF ON;INBUF OFF;"
         self._initiate_cmd = buff + self._initiate_cmd
 
-        fixedz = "ON" if function in ["DCV", "OHM", "OHMF"] else "OFF"
-
-        self._nreadings = nsamples * ntriggers
-        if self._nreadings > 16_777_215:  # noqa: PLR2004
-            msg = f"Too many samples requested, {self._nreadings}. Must be <= 16,777,215"
+        self._num_readings = nsamples * ntriggers
+        if self._num_readings > 16_777_215:  # noqa: PLR2004
+            msg = f"Too many samples requested, {self._num_readings}. Must be <= 16,777,215"
             raise ValueError(msg)
 
-        self._cxn.write(
+        message = (
             f"TARM HOLD;"
             f"TRIG {trig_event};"
             f"MEM FIFO;"
-            f"FUNC {function},{range};"
-            f"APER {aperature};"
+            f"FUNC DCV,{range};"
+            f"APER {aperture};"
             f"AZERO {auto_zero};"
             f"NRDGS {nsamples},AUTO;"
             f"DELAY {delay or 0};"
             f"LFREQ LINE;"
-            f"FIXEDZ {fixedz};"
+            f"FIXEDZ ON;"
             f"MATH OFF;"
             f"DISP OFF;"
             # f'MFORMAT DREAL;'  TODO not working yet
             # f'OFORMAT DREAL;'
         )
+        _ = self._cxn.write(message)
 
         message = self._cxn.query("ERRSTR?")
         if not message.startswith("0,"):
-            self._cxn.raise_exception(message)
+            raise MSLConnectionError(self._cxn, message)
 
         return float(self._cxn.query("APER?"))
 
     def disconnect(self) -> None:
         """Turn the display back on and disconnect from the digital multimeter."""
-        self._cxn.write("DISP ON")
+        _ = self._cxn.write("DISP ON")
         self._cxn.disconnect()
 
     def fetch(self, *, initiate: bool = False) -> npt.NDArray[np.float64]:
@@ -196,7 +185,7 @@ class Agilent3458A:
         #   highest number. Numbers are always assigned in this manner regardless of
         #   whether you're using the FIFO or LIFO mode.
         # This means that samples is an array of [latest reading, ..., first reading]
-        samples = self._cxn.query(f"RMEM 1,{self._nreadings},1")
+        samples = self._cxn.query(f"RMEM 1,{self._num_readings},1")
         # Want FIFO, so reverse to be [first reading, ..., latest reading]
         return np.array(samples.split(",")[::-1], dtype=np.float64)
 
@@ -206,11 +195,11 @@ class Agilent3458A:
         If the digital multimeter has been configured for trigger mode `IMMEDIATE`,
         then the digital multimeter will start acquiring data once this method is called.
         """
-        self._cxn.write(self._initiate_cmd)
+        _ = self._cxn.write(self._initiate_cmd)
 
     def reset(self) -> None:
         """Resets the digital multimeter to the factory default state."""
-        self._cxn.write("RESET;TARM HOLD;")
+        _ = self._cxn.write("RESET;TARM HOLD;")
 
     def trigger(self) -> None:
         """Send a software trigger.
@@ -218,4 +207,4 @@ class Agilent3458A:
         If the digital multimeter has been configured for trigger mode `BUS`, then
         the digital multimeter will start acquiring data once this method is called.
         """
-        self._cxn.write("MEM FIFO;TARM SGL")
+        _ = self._cxn.write("MEM FIFO;TARM SGL")

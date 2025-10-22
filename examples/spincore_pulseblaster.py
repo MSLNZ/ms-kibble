@@ -1,9 +1,12 @@
 """PulseBlaster example."""
 
-from equipment_register import records  # type: ignore[import-not-found]
+from msl.equipment import Connection, Equipment
+
 from kibble import PulseBlaster
 
-blaster = PulseBlaster(records["blaster"])
+equipment = Equipment(manufacturer="SpinCore", model="PulseBlaster", connection=Connection("SDK::spinapi64.dll"))
+
+blaster = PulseBlaster(equipment)
 
 blaster.one_pulse_two_channels(width=10e-6, delay=5e-6)
 

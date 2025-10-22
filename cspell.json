@@ -22,5 +22,16 @@
         "pyproject.toml"
     ],
     "words": [
+        "Agilent",
+        "argtype",
+        "GPIB",
+        "Keysight",
+        "libtype",
+        "nsamples",
+        "ntriggers",
+        "pulseblaster",
+        "spinapi",
+        "spincore",
+        "timetagger"
     ]
 }

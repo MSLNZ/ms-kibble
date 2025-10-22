@@ -1,11 +1,16 @@
 """Agilent3458A example."""
 
-from equipment_register import records  # type: ignore[import-not-found]
+from __future__ import annotations
+
+from msl.equipment import Connection, Equipment
+
 from kibble import Agilent3458A
 
-dmm = Agilent3458A(records["3458a"])
+equipment = Equipment(connection=Connection("GPIB::22"))
 
-dt = dmm.configure(aperature=0.1)
+dmm = Agilent3458A(equipment)
+
+dt = dmm.configure(aperture=0.1)
 dmm.initiate()
 
 data = dmm.fetch()
