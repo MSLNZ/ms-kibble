@@ -1,6 +1,6 @@
 """Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter."""
 
-# cSpell: words INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM fixedz
+# cSpell: words INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM ACAL fixedz
 from __future__ import annotations
 
 import warnings
@@ -31,6 +31,7 @@ class Agilent3458A:
         self._initiate_cmd: str = "<gets updated in configure>"
         self._check_revision: bool = True
         self._num_readings: int = -1
+        self._scale: float = 1.0
 
         self._cxn: GPIB = equipment.connect()
         self._cxn.read_termination = "\r"
@@ -41,9 +42,49 @@ class Agilent3458A:
         if clear:
             self.clear()
 
+    def _wait_until_done(self, seconds: float) -> None:
+        """Wait until the multimeter is done processing the command.
+
+        Args:
+            seconds: The number of seconds to sleep before rechecking if done.
+        """
+        while True:
+            try:
+                # From the "Using the Input Buffer" section of the manual (page 75):
+                #   When using the input buffer, it may be necessary to know when all
+                #   buffered commands have been executed. The multimeter provides this
+                #   information by setting bit 4 (0b00010000 = 16) in the status register
+                val = self._cxn.serial_poll()
+                if val & 16:
+                    return
+            except TypeError:  # serial_poll() received an empty reply
+                pass
+            else:
+                sleep(seconds)
+
     def abort(self) -> None:
         """Abort a measurement in progress."""
         self.clear()
+
+    def calibrate(self, *, wait: bool = True) -> None:
+        """Instructs the digital multimeter to perform a self calibration for DC voltage gain and offset.
+
+        Always disconnect the input signal before performing a self calibration.
+
+        The multimeter should be in a thermally stable environment with its power turned on for at
+        least 2 hours before performing a self calibration. For maximum accuracy, you should perform
+        the self calibration once every 24 hours or when the multimeter's temperature changes by ±1°C
+        from when it was last externally calibrated or from the last self calibration.
+
+        After performing the self calibration, let the instrument sit for 15 minutes before acquiring
+        readings.
+
+        Args:
+            wait: Whether to wait for the self calibration to finish before returning to the calling program.
+        """
+        _ = self._cxn.write("ACAL DCV")
+        if wait:
+            self._wait_until_done(1.0)
 
     def clear(self) -> None:
         """Clears the event registers in all register groups and the error queue."""
@@ -134,8 +175,9 @@ class Agilent3458A:
             f"FIXEDZ ON;"
             f"MATH OFF;"
             f"DISP OFF;"
-            # f'MFORMAT DREAL;'  TODO not working yet
-            # f'OFORMAT DREAL;'
+            f"MFORMAT DINT;"
+            f"OFORMAT DINT;"
+            f"END ALWAYS;"
         )
         _ = self._cxn.write(message)
 
@@ -143,7 +185,11 @@ class Agilent3458A:
         if not message.startswith("0,"):
             raise MSLConnectionError(self._cxn, message)
 
-        return float(self._cxn.query("APER?"))
+        dt = float(self._cxn.query("APER?"))
+        self._scale = float(self._cxn.query("ISCALE?"))
+
+        self._cxn.read_termination = None  # DMM returns binary data in fetch() using EOI termination
+        return dt
 
     def disconnect(self) -> None:
         """Turn the display back on and disconnect from the digital multimeter."""
@@ -165,19 +211,7 @@ class Agilent3458A:
         if initiate:
             self.initiate()
 
-        while True:
-            try:
-                # From the "Using the Input Buffer" section of the manual (page 75):
-                #   When using the input buffer, it may be necessary to know when all
-                #   buffered commands have been executed. The multimeter provides this
-                #   information by setting bit 4 (0b00010000 = 16) in the status register
-                val = self._cxn.serial_poll()
-                if val & 16:
-                    break
-            except TypeError:  # serial_poll() received an empty reply
-                pass
-            else:
-                sleep(0.1)
+        self._wait_until_done(0.1)
 
         # From the RMEM documentation on page 336 of manual (Edition 10, March 2023):
         #   The multimeter assigns a number to each reading in reading memory. The most
@@ -185,9 +219,16 @@ class Agilent3458A:
         #   highest number. Numbers are always assigned in this manner regardless of
         #   whether you're using the FIFO or LIFO mode.
         # This means that samples is an array of [latest reading, ..., first reading]
-        samples = self._cxn.query(f"RMEM 1,{self._num_readings},1")
-        # Want FIFO, so reverse to be [first reading, ..., latest reading]
-        return np.array(samples.split(",")[::-1], dtype=np.float64)
+        # Want FIFO, so reverse array to be [first reading, ..., latest reading]
+        buffer = bytearray(self._cxn.query(f"END ON;RMEM 1,{self._num_readings},1", decode=False))
+
+        # Occasionally the returned buffer had the wrong length, could not reproduce it reliably
+        # Not sure if this 'while' loop fixes the issue
+        size = self._num_readings * 4
+        while len(buffer) < size:
+            buffer.extend(self._cxn.read(decode=False))
+
+        return self._scale * np.frombuffer(buffer, dtype=">i4")[::-1]
 
     def initiate(self) -> None:
         """Put the digital multimeter in the wait-for-trigger state (arm the trigger).
@@ -199,7 +240,15 @@ class Agilent3458A:
 
     def reset(self) -> None:
         """Resets the digital multimeter to the factory default state."""
-        _ = self._cxn.write("RESET;TARM HOLD;")
+        _ = self._cxn.write("RESET;TARM HOLD")
+
+    def serial_poll(self) -> int:
+        """Read the status byte by serial polling the digital multimeter.
+
+        Returns:
+            The status byte.
+        """
+        return self._cxn.serial_poll()
 
     def trigger(self) -> None:
         """Send a software trigger.
