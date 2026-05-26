@@ -1,6 +1,6 @@
 """Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter."""
 
-# cSpell: words INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM ACAL fixedz
+# cSpell: words INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM EXTOUT ACAL RCOMP fixedz
 from __future__ import annotations
 
 import warnings
@@ -34,7 +34,7 @@ class Agilent3458A:
         self._scale: float = 1.0
 
         self._cxn: GPIB = equipment.connect()
-        self._cxn.read_termination = "\r"
+        self._cxn.read_termination = None
         self._cxn.write_termination = "\r"
 
         if reset:
@@ -90,12 +90,13 @@ class Agilent3458A:
         """Clears the event registers in all register groups and the error queue."""
         _ = self._cxn.clear()
 
-    def configure(
+    def configure(  # noqa: C901
         self,
         *,
         range: float = 10,  # noqa: A002
         nsamples: int = 10,
         aperture: float = 0.01,
+        sampling: float | None = None,
         auto_zero: Literal["ONCE", "ON", "OFF"] = "ONCE",
         trigger: Literal["IMMEDIATE", "BUS", "EXTERNAL"] = "IMMEDIATE",
         ntriggers: int = 1,
@@ -107,6 +108,8 @@ class Agilent3458A:
             range: The range to use for the measurement.
             nsamples: The number of samples to acquire after a trigger event.
             aperture: The A/D converter integration time in seconds.
+            sampling: The sampling time in seconds. The sampling time must be greater than
+                the aperture time. If `None`, it is set to be 5% larger than the `aperture` value.
             auto_zero: The auto-zero mode. Either ONCE, ON or OFF.
             trigger: The trigger mode. Either IMMEDIATE, BUS or EXTERNAL.
             ntriggers: The number of triggers that are accepted before
@@ -123,6 +126,13 @@ class Agilent3458A:
 
         if trigger not in ["IMMEDIATE", "BUS", "EXTERNAL"]:
             msg = f"Trigger mode must be IMMEDIATE, BUS or EXTERNAL. Got {trigger!r}"
+            raise ValueError(msg)
+
+        if sampling is None:
+            sampling = aperture * 1.05
+
+        if sampling < aperture:
+            msg = f"Sampling time ({sampling}) must be greater than the aperture time ({aperture})"
             raise ValueError(msg)
 
         # TARM  -> AUTO, EXT, HOLD,              SGL, SYN
@@ -168,9 +178,11 @@ class Agilent3458A:
             f"MEM FIFO;"
             f"FUNC DCV,{range};"
             f"APER {aperture};"
+            f"TIMER {sampling};"
             f"AZERO {auto_zero};"
             f"NRDGS {nsamples},AUTO;"
             f"DELAY {delay or 0};"
+            f"EXTOUT RCOMP;"
             f"LFREQ LINE;"
             f"FIXEDZ ON;"
             f"MATH OFF;"
@@ -185,11 +197,8 @@ class Agilent3458A:
         if not message.startswith("0,"):
             raise MSLConnectionError(self._cxn, message)
 
-        dt = float(self._cxn.query("APER?"))
         self._scale = float(self._cxn.query("ISCALE?"))
-
-        self._cxn.read_termination = None  # DMM returns binary data in fetch() using EOI termination
-        return dt
+        return float(self._cxn.query("APER?"))
 
     def disconnect(self) -> None:
         """Turn the display back on and disconnect from the digital multimeter."""
@@ -203,7 +212,7 @@ class Agilent3458A:
         all samples have been acquired.
 
         Args:
-            initiate: Whether to call `initiate()` before fetching the samples.
+            initiate: Whether to call [initiate][..initiate] before fetching the samples.
 
         Returns:
             The samples.
@@ -220,14 +229,7 @@ class Agilent3458A:
         #   whether you're using the FIFO or LIFO mode.
         # This means that samples is an array of [latest reading, ..., first reading]
         # Want FIFO, so reverse array to be [first reading, ..., latest reading]
-        buffer = bytearray(self._cxn.query(f"END ON;RMEM 1,{self._num_readings},1", decode=False))
-
-        # Occasionally the returned buffer had the wrong length, could not reproduce it reliably
-        # Not sure if this 'while' loop fixes the issue
-        size = self._num_readings * 4
-        while len(buffer) < size:
-            buffer.extend(self._cxn.read(decode=False))
-
+        buffer = self._cxn.query(f"END ON;RMEM 1,{self._num_readings},1", decode=False, size=self._num_readings * 4)
         return self._scale * np.frombuffer(buffer, dtype=">i4")[::-1]
 
     def initiate(self) -> None:
