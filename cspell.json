@@ -25,16 +25,19 @@
         "adduser",
         "Agilent",
         "argtype",
+        "boardtype",
         "frombuffer",
         "GPIB",
         "Keysight",
         "libspinapi",
         "libtype",
+        "lsusb",
         "nsamples",
         "ntriggers",
         "pulseblaster",
         "spinapi",
         "spincore",
+        "sysconfdir",
         "timetagger"
     ]
 }
