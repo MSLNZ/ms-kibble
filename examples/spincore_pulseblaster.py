@@ -4,7 +4,7 @@ from msl.equipment import Connection, Equipment
 
 from kibble import PulseBlaster
 
-equipment = Equipment(manufacturer="SpinCore", model="PulseBlaster", connection=Connection("SDK::spinapi64.dll"))
+equipment = Equipment(manufacturer="SpinCore", model="PulseBlaster", connection=Connection("SDK::libspinapi"))
 
 blaster = PulseBlaster(equipment)
 

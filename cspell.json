@@ -22,11 +22,13 @@
         "pyproject.toml"
     ],
     "words": [
+        "adduser",
         "Agilent",
         "argtype",
         "frombuffer",
         "GPIB",
         "Keysight",
+        "libspinapi",
         "libtype",
         "nsamples",
         "ntriggers",
