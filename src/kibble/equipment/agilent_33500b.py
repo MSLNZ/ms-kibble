@@ -1,8 +1,6 @@
 """Agilent 33500B Waveform Generator."""
 
-# cSpell: words VRMS
-from __future__ import annotations
-
+# cSpell: ignore VRMS
 from typing import TYPE_CHECKING
 
 from msl.equipment import MSLConnectionError
@@ -10,7 +8,7 @@ from msl.equipment import MSLConnectionError
 if TYPE_CHECKING:
     from typing import Literal
 
-    from msl.equipment import Equipment, MessageBased
+    from msl.equipment import Equipment, Message
 
 
 class Agilent33500B:
@@ -24,7 +22,7 @@ class Agilent33500B:
             reset: Whether to automatically send the `*RST` command.
             clear: Whether to automatically send the `*CLS` command.
         """
-        self._cxn: MessageBased = equipment.connect()
+        self._cxn: Message = equipment.connect()
 
         if reset:
             self.reset()

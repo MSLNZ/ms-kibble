@@ -1,8 +1,6 @@
 """SpinCore PulseBlaster."""
 
-# cSpell: words pbonly
-from __future__ import annotations
-
+# cSpell: ignore pbonly
 import re
 from ctypes import c_char_p, c_double, c_int
 from dataclasses import dataclass

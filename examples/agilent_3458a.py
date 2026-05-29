@@ -1,7 +1,5 @@
 """Agilent3458A example."""
 
-from __future__ import annotations
-
 from msl.equipment import Connection, Equipment
 
 from kibble import Agilent3458A

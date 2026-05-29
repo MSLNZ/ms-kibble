@@ -2,8 +2,6 @@
 
 # pyright: reportMissingImports=false, reportMissingTypeStubs=false, reportAssignmentType=false, reportAttributeAccessIssue=false, reportUnknownMemberType=false, reportOptionalMemberAccess=false, reportUninitializedInstanceVariable=false
 # cSpell: ignore redef Deadtime
-from __future__ import annotations
-
 from dataclasses import KW_ONLY, dataclass
 from enum import IntEnum
 from time import perf_counter, sleep

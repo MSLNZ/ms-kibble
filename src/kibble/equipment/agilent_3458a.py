@@ -1,8 +1,6 @@
 """Agilent (or Hewlett Packard or Keysight) 3458A digital multimeter."""
 
-# cSpell: words INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM EXTOUT ACAL RCOMP fixedz
-from __future__ import annotations
-
+# cSpell: ignore INBUF TARM NRDGS AZERO LFREQ DISP MFORMAT OFORMAT DREAL ERRSTR RMEM EXTOUT ACAL RCOMP fixedz
 import warnings
 from time import sleep
 from typing import TYPE_CHECKING
