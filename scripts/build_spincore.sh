@@ -4,7 +4,7 @@
 VERSION="SpinAPI_linux-20250210-x86_64"
 
 # Install build dependencies
-sudo apt install wget build-essential cmake --yes
+sudo apt-get install wget build-essential cmake --yes
 
 # Download source code
 wget https://spincore.com/CD/Setup/linux/$VERSION.tar.gz
