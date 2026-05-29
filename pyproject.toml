@@ -9,6 +9,7 @@ dependencies = [
   "matplotlib>=3.10.3",
   "msl-equipment @ git+https://github.com/MSLNZ/msl-equipment.git",
   "scipy>=1.15.3",
+  "swabian-timetagger>=2.21.2 ; sys_platform == 'linux'",
 ]
 requires-python = ">= 3.12"
 description = "MSL Kibble Balance software."

@@ -1,7 +1,7 @@
 """Swabian TimeTagger."""
 
-# pyright: reportMissingTypeStubs=false, reportAssignmentType=false, reportAttributeAccessIssue=false, reportUnknownMemberType=false, reportOptionalMemberAccess=false, reportUninitializedInstanceVariable=false
-# cSpell: words redef Deadtime
+# pyright: reportMissingImports=false, reportMissingTypeStubs=false, reportAssignmentType=false, reportAttributeAccessIssue=false, reportUnknownMemberType=false, reportOptionalMemberAccess=false, reportUninitializedInstanceVariable=false
+# cSpell: ignore redef Deadtime
 from __future__ import annotations
 
 from dataclasses import KW_ONLY, dataclass
@@ -13,41 +13,45 @@ import numpy as np
 from msl.equipment.schema import Equipment
 
 try:
-    import TimeTagger
+    # The Swabian package is available on PyPI, but only for a linux environment
+    from Swabian import TimeTagger  # type: ignore[import-untyped]
 except ModuleNotFoundError:
-    import os
-    import sys
-
     # Assume running on Windows
-    arch = "x64" if sys.maxsize > 2**32 else "x86"
-    sys.path.append(os.path.join(os.environ.get("TIMETAGGER_INSTALL_PATH", ""), "driver", arch))  # noqa: PTH118
     try:
-        import TimeTagger  # type: ignore[import-untyped]
+        import TimeTagger
     except ModuleNotFoundError:
+        import os
+        import sys
 
-        class TimeTagger:  # type: ignore[no-redef]
-            """Mocked TimeTagger module."""
+        arch = "x64" if sys.maxsize > 2**32 else "x86"
+        sys.path.append(os.path.join(os.environ.get("TIMETAGGER_INSTALL_PATH", ""), "driver", arch))  # noqa: PTH118
+        try:
+            import TimeTagger  # type: ignore[import-not-found]
+        except ModuleNotFoundError:
 
-            class Resolution:
-                """Mocked Resolution enum."""
+            class TimeTagger:  # type: ignore[no-redef]
+                """Mocked TimeTagger module."""
 
-                Standard: int = 0
+                class Resolution:
+                    """Mocked Resolution enum."""
 
-            class CustomMeasurement:
-                """Mocked CustomMeasurement class."""
+                    Standard: int = 0
 
-            class TimeTagger:
-                """Mocked TimeTagger."""
+                class CustomMeasurement:
+                    """Mocked CustomMeasurement class."""
 
-            @staticmethod
-            def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # pyright: ignore[reportUnusedParameter]  # noqa: ARG004, N802
-                """Mocked createTimeTagger function."""
-                msg = (
-                    "The Swabian Instruments TimeTagger module cannot be found.\n"
-                    "Install it from https://www.swabianinstruments.com/time-tagger/downloads/\n"
-                    "and ensure that the directory containing the TimeTagger module is available on sys.path"
-                )
-                raise ModuleNotFoundError(msg)
+                class TimeTagger:
+                    """Mocked TimeTagger."""
+
+                @staticmethod
+                def createTimeTagger(serial: str = "", resolution: int = 0) -> None:  # pyright: ignore[reportUnusedParameter]  # noqa: ARG004, N802
+                    """Mocked createTimeTagger function."""
+                    msg = (
+                        "The Swabian Instruments TimeTagger module cannot be found.\n"
+                        "Install it from https://www.swabianinstruments.com/time-tagger/downloads/\n"
+                        "and ensure that the directory containing the TimeTagger module is available on sys.path"
+                    )
+                    raise ModuleNotFoundError(msg)
 
 
 if TYPE_CHECKING:
