@@ -1,6 +1,6 @@
 site_name: MSL Kibble
 site_description: MSL Kibble Balance software.
-copyright: Copyright &copy; 2024-2025 Measurement Standards Laboratory of New Zealand
+copyright: Copyright &copy; 2024-2026 Measurement Standards Laboratory of New Zealand
 repo_url: https://github.com/MSLNZ/ms-kibble
 
 theme:
