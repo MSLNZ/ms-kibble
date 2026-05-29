@@ -111,7 +111,6 @@ title = "Kibble coverage report"
 
 [tool.mypy]
 cache_dir = ".cache/mypy"
-platform = "win32"
 strict = true
 strict_bytes = true
 allow_redefinition = false
@@ -131,7 +130,6 @@ warn_unreachable = true
 failOnWarnings = true
 typeCheckingMode = "recommended"
 useLibraryCodeForTypes = false
-pythonPlatform = "Windows"
 exclude = [
     "**/.*",
     "**/__pycache__",
